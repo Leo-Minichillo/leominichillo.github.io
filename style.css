@@ -341,16 +341,37 @@ a {
     transform: translateX(-50%);
 }
 
-.scroll-line {
-    width: 1px;
-    height: 60px;
-    background: linear-gradient(to bottom, var(--accent), transparent);
-    animation: scrollPulse 2s ease-in-out infinite;
+.trend-line {
+    width: 120px;
+    height: 48px;
 }
 
-@keyframes scrollPulse {
-    0%, 100% { opacity: 0.3; transform: scaleY(0.6); }
-    50% { opacity: 1; transform: scaleY(1); }
+.trend-line-path {
+    stroke-dasharray: 200;
+    stroke-dashoffset: 200;
+    animation: drawLine 2s ease-out forwards, pulseLine 3s ease-in-out 2s infinite;
+}
+
+.trend-line-glow {
+    stroke-dasharray: 200;
+    stroke-dashoffset: 200;
+    opacity: 0;
+    filter: blur(4px);
+    animation: drawLine 2s ease-out forwards, pulseGlow 3s ease-in-out 2s infinite;
+}
+
+@keyframes drawLine {
+    to { stroke-dashoffset: 0; }
+}
+
+@keyframes pulseLine {
+    0%, 100% { opacity: 0.7; }
+    50% { opacity: 1; }
+}
+
+@keyframes pulseGlow {
+    0%, 100% { opacity: 0.15; }
+    50% { opacity: 0.4; }
 }
 
 /* ---- Sections Common ---- */
