@@ -136,23 +136,53 @@
         });
     });
 
-    // ---- Beat the Spread Game ----
+    // ---- Beat the Spread Game (2025 DVOA Ratings) ----
+    // Point ratings derived from final 2025 FTN DVOA rankings
+    // Positive = above average, negative = below average
     var nflTeams = [
-        'Cardinals', 'Falcons', 'Ravens', 'Bills', 'Panthers', 'Bears',
-        'Bengals', 'Browns', 'Cowboys', 'Broncos', 'Lions', 'Packers',
-        'Texans', 'Colts', 'Jaguars', 'Chiefs', 'Raiders', 'Chargers',
-        'Rams', 'Dolphins', 'Vikings', 'Patriots', 'Saints', 'Giants',
-        'Jets', 'Eagles', 'Steelers', '49ers', 'Seahawks', 'Buccaneers',
-        'Titans', 'Commanders'
+        { name: 'Seahawks',    rating:  10.5 },  // DVOA #1
+        { name: 'Rams',        rating:   9.5 },  // DVOA #2
+        { name: 'Lions',       rating:   7.0 },  // DVOA #3
+        { name: 'Texans',      rating:   5.5 },  // DVOA #4
+        { name: 'Colts',       rating:   5.0 },  // DVOA #5
+        { name: 'Jaguars',     rating:   4.5 },  // DVOA #6
+        { name: 'Broncos',     rating:   4.0 },  // DVOA #7
+        { name: 'Bills',       rating:   3.5 },  // DVOA #8
+        { name: 'Patriots',    rating:   3.0 },  // DVOA #9
+        { name: '49ers',       rating:   2.5 },  // DVOA #10
+        { name: 'Packers',     rating:   2.0 },  // DVOA #11
+        { name: 'Steelers',    rating:   1.5 },  // DVOA #12
+        { name: 'Eagles',      rating:   1.0 },  // DVOA #13
+        { name: 'Ravens',      rating:   0.5 },  // DVOA #14
+        { name: 'Chiefs',      rating:   0.0 },  // DVOA #15
+        { name: 'Bears',       rating:  -0.5 },  // DVOA #16
+        { name: 'Chargers',    rating:  -1.0 },  // DVOA #17
+        { name: 'Vikings',     rating:  -1.5 },  // DVOA #18
+        { name: 'Falcons',     rating:  -2.0 },  // DVOA #19
+        { name: 'Buccaneers',  rating:  -2.5 },  // DVOA #20
+        { name: 'Bengals',     rating:  -3.0 },  // DVOA #21
+        { name: 'Cowboys',     rating:  -3.5 },  // DVOA #22
+        { name: 'Commanders',  rating:  -4.0 },  // DVOA #23
+        { name: 'Dolphins',    rating:  -4.5 },  // DVOA #24
+        { name: 'Panthers',    rating:  -5.0 },  // DVOA #25
+        { name: 'Giants',      rating:  -5.5 },  // DVOA #26
+        { name: 'Cardinals',   rating:  -6.0 },  // DVOA #27
+        { name: 'Saints',      rating:  -6.5 },  // DVOA #28
+        { name: 'Titans',      rating:  -7.0 },  // DVOA #29
+        { name: 'Raiders',     rating:  -8.0 },  // DVOA #30
+        { name: 'Browns',      rating:  -9.0 },  // DVOA #31
+        { name: 'Jets',        rating: -10.0 }   // DVOA #32
     ];
+
+    var HFA = 2.5; // home field advantage in points
 
     var gameState = {
         bankroll: 1000,
         wins: 0,
         losses: 0,
         pushes: 0,
-        awayTeam: '',
-        homeTeam: '',
+        awayTeam: null,
+        homeTeam: null,
         spread: 0,
         locked: false
     };
@@ -179,28 +209,30 @@
         return [shuffled[0], shuffled[1]];
     }
 
-    function generateSpread() {
-        // Spreads from 1 to 14 in 0.5 increments
-        var raw = Math.floor(Math.random() * 27) + 2; // 2-28
-        return raw / 2; // 1.0 to 14.0
+    function calculateSpread(home, away) {
+        // Spread from home perspective: positive = home favored
+        var rawSpread = home.rating - away.rating + HFA;
+        // Add slight market noise (±1.5 pts)
+        var noise = (Math.random() - 0.5) * 3;
+        return Math.round((rawSpread + noise) * 2) / 2; // nearest 0.5
     }
 
     function formatSpread(val) {
-        return val > 0 ? '+' + val.toFixed(1) : val.toFixed(1);
+        if (val === 0) return 'PK';
+        var str = val % 1 === 0 ? Math.abs(val).toFixed(0) : Math.abs(val).toFixed(1);
+        return (val > 0 ? '+' : '-') + str;
     }
 
-    function simulateGame(spread) {
-        // Home team is favored by -spread
-        // Generate a margin relative to the spread with some noise
-        // margin > 0 means home won by that many points
-        var homeEdge = spread; // positive spread means home is favored
+    function simulateGame(home, away) {
+        // Expected margin based on true team skill + home field
+        var expectedMargin = home.rating - away.rating + HFA;
+        // Normal-ish noise (~13 pt std dev, realistic NFL variance)
         var noise = 0;
-        for (var i = 0; i < 6; i++) {
+        for (var i = 0; i < 12; i++) {
             noise += Math.random();
         }
-        noise = (noise - 3) * 8; // normal-ish, std dev ~8 points
-        var margin = homeEdge + noise;
-        return Math.round(margin);
+        noise = (noise - 6) * 5.3; // ~13 pt std dev
+        return Math.round(expectedMargin + noise);
     }
 
     function generateScores(margin) {
@@ -219,11 +251,11 @@
         var teams = pickTwo();
         gameState.awayTeam = teams[0];
         gameState.homeTeam = teams[1];
-        gameState.spread = generateSpread();
+        gameState.spread = calculateSpread(gameState.homeTeam, gameState.awayTeam);
 
-        awayNameEl.textContent = gameState.awayTeam;
-        homeNameEl.textContent = gameState.homeTeam;
-        // Home team is favored (negative spread)
+        awayNameEl.textContent = gameState.awayTeam.name;
+        homeNameEl.textContent = gameState.homeTeam.name;
+        // Spread display: home gets inverse, away gets spread value
         homeSpreadEl.textContent = formatSpread(-gameState.spread);
         awaySpreadEl.textContent = formatSpread(gameState.spread);
 
@@ -250,14 +282,11 @@
 
         // Simulate after a short delay for suspense
         setTimeout(function () {
-            var margin = simulateGame(gameState.spread);
+            var margin = simulateGame(gameState.homeTeam, gameState.awayTeam);
             var scores = generateScores(margin);
 
             // Determine ATS result
-            // If you picked home (spread is -X), home needs to win by more than spread
-            // If you picked away (spread is +X), away needs to cover
-            var coverMargin; // positive = home covers
-            coverMargin = margin - gameState.spread; // margin relative to spread
+            var coverMargin = margin - gameState.spread; // positive = home covers
 
             var userWon;
             var isPush = false;
@@ -287,7 +316,7 @@
             bankrollEl.className = 'game-bankroll-value' + (gameState.bankroll < 1000 ? ' negative' : '');
             recordEl.textContent = gameState.wins + '-' + gameState.losses + (gameState.pushes > 0 ? '-' + gameState.pushes : '');
 
-            // Show winner/loser styling
+            // Show winner/loser styling (based on who won the game)
             if (margin > 0) {
                 homeBtn.classList.add('winner');
                 awayBtn.classList.add('loser');
@@ -300,7 +329,7 @@
             var outcomeClass = isPush ? 'push' : (userWon ? 'win' : 'loss');
             var outcomeText = isPush ? 'PUSH — $100 returned' : (userWon ? 'WIN +$100' : 'LOSS -$100');
             resultEl.innerHTML =
-                '<span class="game-result-score">' + gameState.awayTeam + ' ' + scores.away + ' — ' + scores.home + ' ' + gameState.homeTeam + '</span>' +
+                '<span class="game-result-score">' + gameState.awayTeam.name + ' ' + scores.away + ' — ' + scores.home + ' ' + gameState.homeTeam.name + '</span>' +
                 '<span class="game-result-outcome ' + outcomeClass + '">' + outcomeText + '</span>';
 
             // If bankroll is 0
