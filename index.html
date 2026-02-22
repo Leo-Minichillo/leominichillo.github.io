@@ -68,9 +68,20 @@
             </div>
         </div>
         <div class="scroll-indicator">
-            <svg class="trend-line" viewBox="0 0 140 56" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path class="trend-line-path" d="M 2 52 C 14 50, 22 44, 30 40 C 38 36, 44 38, 52 32 C 60 26, 66 28, 76 20 C 86 12, 96 14, 108 8 C 116 4, 128 2, 138 2" stroke="#10b981" stroke-width="2" stroke-linecap="round" />
-                <path class="trend-line-glow" d="M 2 52 C 14 50, 22 44, 30 40 C 38 36, 44 38, 52 32 C 60 26, 66 28, 76 20 C 86 12, 96 14, 108 8 C 116 4, 128 2, 138 2" stroke="#10b981" stroke-width="4" stroke-linecap="round" />
+            <svg class="trend-line" viewBox="0 0 200 70" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <linearGradient id="lineGrad" x1="0" y1="0" x2="1" y2="0">
+                        <stop offset="0%" stop-color="#10b981" stop-opacity="0.4"/>
+                        <stop offset="100%" stop-color="#10b981"/>
+                    </linearGradient>
+                    <linearGradient id="fillGrad" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stop-color="#10b981" stop-opacity="0.15"/>
+                        <stop offset="100%" stop-color="#10b981" stop-opacity="0"/>
+                    </linearGradient>
+                </defs>
+                <path class="trend-line-fill" d="M 4 64 C 18 60, 30 56, 42 50 C 54 44, 58 46, 72 38 C 86 30, 90 33, 106 24 C 122 15, 134 17, 152 10 C 164 5, 180 3, 196 3 L 196 68 L 4 68 Z" fill="url(#fillGrad)" />
+                <path class="trend-line-path" d="M 4 64 C 18 60, 30 56, 42 50 C 54 44, 58 46, 72 38 C 86 30, 90 33, 106 24 C 122 15, 134 17, 152 10 C 164 5, 180 3, 196 3" stroke="url(#lineGrad)" stroke-width="2.5" stroke-linecap="round" fill="none" />
+                <circle class="trend-line-dot" cx="196" cy="3" r="3" fill="#10b981" />
             </svg>
         </div>
     </section>

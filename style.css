@@ -336,42 +336,47 @@ a {
 
 .scroll-indicator {
     position: absolute;
-    bottom: 40px;
+    bottom: 32px;
     left: 50%;
     transform: translateX(-50%);
 }
 
 .trend-line {
-    width: 120px;
-    height: 48px;
+    width: 180px;
+    height: 64px;
+}
+
+.trend-line-fill {
+    opacity: 0;
+    animation: fadeInFill 1s ease-out 1.8s forwards;
 }
 
 .trend-line-path {
-    stroke-dasharray: 200;
-    stroke-dashoffset: 200;
-    animation: drawLine 2s ease-out forwards, pulseLine 3s ease-in-out 2s infinite;
+    stroke-dasharray: 280;
+    stroke-dashoffset: 280;
+    animation: drawLine 2.2s ease-out forwards;
 }
 
-.trend-line-glow {
-    stroke-dasharray: 200;
-    stroke-dashoffset: 200;
+.trend-line-dot {
     opacity: 0;
-    filter: blur(4px);
-    animation: drawLine 2s ease-out forwards, pulseGlow 3s ease-in-out 2s infinite;
+    animation: dotAppear 0.3s ease-out 2.2s forwards, dotPulse 2.5s ease-in-out 2.5s infinite;
 }
 
 @keyframes drawLine {
     to { stroke-dashoffset: 0; }
 }
 
-@keyframes pulseLine {
-    0%, 100% { opacity: 0.7; }
-    50% { opacity: 1; }
+@keyframes fadeInFill {
+    to { opacity: 1; }
 }
 
-@keyframes pulseGlow {
-    0%, 100% { opacity: 0.15; }
-    50% { opacity: 0.4; }
+@keyframes dotAppear {
+    to { opacity: 1; }
+}
+
+@keyframes dotPulse {
+    0%, 100% { r: 3; opacity: 0.8; }
+    50% { r: 5; opacity: 1; filter: drop-shadow(0 0 6px #10b981); }
 }
 
 /* ---- Sections Common ---- */

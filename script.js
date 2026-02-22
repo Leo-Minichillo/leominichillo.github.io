@@ -316,11 +316,11 @@
             bankrollEl.className = 'game-bankroll-value' + (gameState.bankroll < 1000 ? ' negative' : '');
             recordEl.textContent = gameState.wins + '-' + gameState.losses + (gameState.pushes > 0 ? '-' + gameState.pushes : '');
 
-            // Show winner/loser styling (based on who won the game)
-            if (margin > 0) {
+            // Show winner/loser styling (based on who covered the spread)
+            if (coverMargin > 0) {
                 homeBtn.classList.add('winner');
                 awayBtn.classList.add('loser');
-            } else if (margin < 0) {
+            } else if (coverMargin < 0) {
                 awayBtn.classList.add('winner');
                 homeBtn.classList.add('loser');
             }
