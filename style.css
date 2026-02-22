@@ -808,6 +808,228 @@ section {
     line-height: 1.6;
 }
 
+/* ---- Project On Hold Status ---- */
+.project-status.on-hold {
+    color: #94a3b8;
+    background: rgba(148, 163, 184, 0.1);
+    border: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+/* ---- Beat the Spread Game ---- */
+#game {
+    background: linear-gradient(180deg, var(--bg) 0%, #0a0d0c 50%, var(--bg) 100%);
+}
+
+.game-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+}
+
+.game-bankroll {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+}
+
+.game-bankroll-label {
+    font-size: 0.8rem;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-weight: 600;
+}
+
+.game-bankroll-value {
+    font-family: var(--mono);
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: var(--accent);
+    letter-spacing: -0.02em;
+    transition: color 0.3s;
+}
+
+.game-bankroll-value.negative {
+    color: var(--negative);
+}
+
+.game-record {
+    font-family: var(--mono);
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+.game-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 40px;
+    width: 100%;
+    max-width: 640px;
+    transition: border-color 0.3s;
+}
+
+.game-matchup {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 20px;
+    align-items: center;
+}
+
+.game-team {
+    background: var(--bg);
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    padding: 28px 20px;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    color: var(--text);
+    font-family: var(--font);
+}
+
+.game-team:hover {
+    border-color: var(--accent);
+    background: var(--accent-glow);
+    transform: translateY(-2px);
+}
+
+.game-team:active {
+    transform: translateY(0);
+}
+
+.game-team.selected {
+    border-color: var(--accent);
+    background: var(--accent-glow);
+    box-shadow: 0 0 20px rgba(16, 185, 129, 0.15);
+}
+
+.game-team.winner {
+    border-color: var(--accent);
+    background: rgba(16, 185, 129, 0.12);
+}
+
+.game-team.loser {
+    border-color: var(--negative);
+    background: rgba(239, 68, 68, 0.06);
+    opacity: 0.6;
+}
+
+.game-team:disabled {
+    cursor: default;
+}
+
+.game-team:disabled:hover {
+    transform: none;
+}
+
+.game-team-name {
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+}
+
+.game-team-spread {
+    font-family: var(--mono);
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--accent);
+}
+
+.game-vs {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+}
+
+.game-vs span {
+    font-size: 0.75rem;
+    font-weight: 800;
+    color: var(--text-dim);
+    letter-spacing: 0.15em;
+}
+
+.game-bet-amount {
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    color: var(--text-dim);
+    white-space: nowrap;
+}
+
+.game-result {
+    text-align: center;
+    margin-top: 24px;
+    min-height: 60px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+}
+
+.game-result-score {
+    font-family: var(--mono);
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text);
+}
+
+.game-result-outcome {
+    font-family: var(--mono);
+    font-size: 0.85rem;
+    font-weight: 700;
+    padding: 4px 14px;
+    border-radius: 4px;
+    letter-spacing: 0.05em;
+}
+
+.game-result-outcome.win {
+    color: var(--accent);
+    background: var(--accent-glow);
+}
+
+.game-result-outcome.loss {
+    color: var(--negative);
+    background: rgba(239, 68, 68, 0.1);
+}
+
+.game-result-outcome.push {
+    color: #fbbf24;
+    background: rgba(251, 191, 36, 0.1);
+}
+
+.game-deal-btn {
+    font-size: 0.9rem;
+    padding: 14px 36px;
+}
+
+@media (max-width: 768px) {
+    .game-matchup {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .game-vs {
+        flex-direction: row;
+        gap: 12px;
+    }
+
+    .game-card {
+        padding: 24px;
+    }
+
+    .game-bankroll-value {
+        font-size: 2rem;
+    }
+}
+
 /* ---- Footer ---- */
 footer {
     padding: 48px 0;

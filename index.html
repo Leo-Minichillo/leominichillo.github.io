@@ -20,6 +20,7 @@
                 <a href="#career">Career</a>
                 <a href="#results">Results</a>
                 <a href="#projects">Projects</a>
+                <a href="#game">Game</a>
             </div>
             <button class="nav-toggle" id="navToggle" aria-label="Toggle menu">
                 <span></span>
@@ -32,6 +33,7 @@
             <a href="#career">Career</a>
             <a href="#results">Results</a>
             <a href="#projects">Projects</a>
+            <a href="#game">Game</a>
         </div>
     </nav>
 
@@ -285,6 +287,54 @@
                         </div>
                     </div>
                 </div>
+            </div>
+
+            <div class="project-card" style="margin-top: 24px;">
+                <div class="project-status on-hold">On Hold</div>
+                <h3>The Betting Playbook</h3>
+                <p>YouTube channel covering sports betting strategy, data-driven analysis, and prediction market insights. Currently on hold &mdash; can't create sports betting content while working at Fanatics.</p>
+                <div class="project-tech">
+                    <span class="tech-tag">YouTube</span>
+                    <span class="tech-tag">Sports Betting</span>
+                    <span class="tech-tag">Content Creation</span>
+                    <span class="tech-tag">Analytics Breakdowns</span>
+                </div>
+                <a href="https://www.youtube.com/@TheBettingPlaybook" target="_blank" rel="noopener" class="btn btn-outline" style="margin-top: 8px;">Watch on YouTube &nearr;</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Beat the Spread Game -->
+    <section id="game">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag">05</span>
+                <h2>Beat the Spread</h2>
+            </div>
+            <div class="game-wrapper">
+                <div class="game-bankroll">
+                    <span class="game-bankroll-label">Bankroll</span>
+                    <span class="game-bankroll-value" id="gameBankroll">$1,000</span>
+                </div>
+                <div class="game-record" id="gameRecord">0-0</div>
+                <div class="game-card" id="gameCard">
+                    <div class="game-matchup">
+                        <button class="game-team" id="awayTeam" data-side="away">
+                            <span class="game-team-name" id="awayName">--</span>
+                            <span class="game-team-spread" id="awaySpread">--</span>
+                        </button>
+                        <div class="game-vs">
+                            <span>VS</span>
+                            <div class="game-bet-amount">$100 / bet</div>
+                        </div>
+                        <button class="game-team" id="homeTeam" data-side="home">
+                            <span class="game-team-name" id="homeName">--</span>
+                            <span class="game-team-spread" id="homeSpread">--</span>
+                        </button>
+                    </div>
+                    <div class="game-result" id="gameResult"></div>
+                </div>
+                <button class="btn btn-primary game-deal-btn" id="gameNewBtn">New Matchup</button>
             </div>
         </div>
     </section>
