@@ -65,6 +65,7 @@
             <div class="hero-cta">
                 <a href="#results" class="btn btn-primary">View Results</a>
                 <a href="https://polymarket.com/profile/0xc42e3Ad86BD9233631b5d494D29eA8aCaa25EdBd" class="btn btn-outline" target="_blank" rel="noopener">Polymarket &nearr;</a>
+                <a href="resume.pdf" class="btn btn-outline" target="_blank" rel="noopener">Resume &nearr;</a>
             </div>
         </div>
         <div class="trend-line-wrapper">
@@ -96,7 +97,10 @@
             </div>
             <div class="about-grid">
                 <div class="about-text">
-                    <p class="about-lead">I'm Leo &mdash; a data-driven sports trader who loves chasing edges and finding exploits.</p>
+                    <div class="about-intro">
+                        <img src="leo.jpg" alt="Leo Minichillo" class="about-photo">
+                        <p class="about-lead">I'm Leo &mdash; a data-driven sports trader who loves chasing edges and finding exploits.</p>
+                    </div>
                     <div class="timeline">
                         <div class="timeline-item">
                             <div class="timeline-marker"></div>
@@ -349,18 +353,43 @@
             <div class="section-header">
                 <span class="section-tag">05</span>
                 <h2>Beat the Spread</h2>
-                <p style="color: var(--text-dim); font-size: 0.85rem; margin-top: 8px;">Lines powered by 2025 DVOA ratings &mdash; spot the mispriced spreads and size your bets</p>
             </div>
             <div class="game-wrapper">
-                <div class="game-bankroll">
-                    <span class="game-bankroll-label">Bankroll</span>
-                    <span class="game-bankroll-value" id="gameBankroll">$1,000</span>
+                <!-- How to Play -->
+                <div class="game-explainer">
+                    <button class="game-explainer-toggle" id="explainerToggle">
+                        <span>How to Play</span>
+                        <span class="explainer-arrow" id="explainerArrow">&#9662;</span>
+                    </button>
+                    <div class="game-explainer-content" id="explainerContent">
+                        <p>Each matchup simulates an NFL game using <strong>DVOA team ratings</strong> (Defense-adjusted Value Over Average) — a measure of true team strength. The home team gets a 2.5-point advantage.</p>
+                        <p>The posted spread is based on the median expected outcome, but <strong>it's intentionally biased up to &plusmn;4 points</strong>. Your job is to spot when the line is off from the true value. When you see a big misprice, bet heavy. When it looks fair, bet small or skip.</p>
+                        <p>Game results are simulated with realistic NFL variance (~13.5 pt standard deviation). Green = covered the spread, Red = didn't. Think like a sharp — find the edge, size your bets, and grow your bankroll.</p>
+                    </div>
                 </div>
-                <div class="game-record" id="gameRecord">0-0</div>
+
+                <!-- Stats Row -->
+                <div class="game-stats-row">
+                    <div class="game-stat-block">
+                        <span class="game-stat-label">Bankroll</span>
+                        <span class="game-bankroll-value" id="gameBankroll">$1,000</span>
+                    </div>
+                    <div class="game-stat-block">
+                        <span class="game-stat-label">Record</span>
+                        <span class="game-stat-value" id="gameRecord">0-0</span>
+                    </div>
+                    <div class="game-stat-block">
+                        <span class="game-stat-label">Best Run</span>
+                        <span class="game-stat-value game-stat-best" id="gameBestRun">--</span>
+                    </div>
+                </div>
+
+                <!-- Game Card -->
                 <div class="game-card" id="gameCard">
                     <div class="game-matchup-header" id="matchupHeader">-- @ --</div>
                     <div class="game-matchup">
                         <button class="game-team" id="awayTeam" data-side="away">
+                            <span class="game-team-label">Away</span>
                             <span class="game-team-name" id="awayName">--</span>
                             <span class="game-team-spread" id="awaySpread">--</span>
                         </button>
@@ -368,6 +397,7 @@
                             <span>@</span>
                         </div>
                         <button class="game-team" id="homeTeam" data-side="home">
+                            <span class="game-team-label">Home</span>
                             <span class="game-team-name" id="homeName">--</span>
                             <span class="game-team-spread" id="homeSpread">--</span>
                         </button>
@@ -399,6 +429,10 @@
                 <span class="footer-name">Leo Minichillo</span>
                 <div class="footer-links">
                     <a href="https://polymarket.com/profile/0xc42e3Ad86BD9233631b5d494D29eA8aCaa25EdBd" target="_blank" rel="noopener">Polymarket</a>
+                    <a href="https://www.linkedin.com/in/leo-minichillo/" target="_blank" rel="noopener">LinkedIn</a>
+                    <a href="https://github.com/Leo-Minichillo" target="_blank" rel="noopener">GitHub</a>
+                    <a href="https://x.com/leo_minichillo" target="_blank" rel="noopener">X</a>
+                    <a href="resume.pdf" target="_blank" rel="noopener">Resume</a>
                 </div>
             </div>
         </div>

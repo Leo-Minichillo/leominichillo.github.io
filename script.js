@@ -136,9 +136,19 @@
         });
     });
 
+    // ---- How to Play toggle ----
+    var explainerToggle = document.getElementById('explainerToggle');
+    var explainerContent = document.getElementById('explainerContent');
+    var explainerArrow = document.getElementById('explainerArrow');
+
+    if (explainerToggle) {
+        explainerToggle.addEventListener('click', function () {
+            explainerContent.classList.toggle('open');
+            explainerArrow.classList.toggle('open');
+        });
+    }
+
     // ---- Beat the Spread Game (2025 DVOA Ratings) ----
-    // Point ratings derived from final 2025 FTN DVOA rankings
-    // These represent true team skill — the simulation uses these directly
     var nflTeams = [
         { name: 'Seahawks',    rating:  10.5 },
         { name: 'Rams',        rating:   9.5 },
@@ -176,20 +186,28 @@
 
     var HFA = 2.5; // home field advantage in points
 
+    // Load best run from localStorage
+    var savedBest = null;
+    try { savedBest = JSON.parse(localStorage.getItem('btsbestrun')); } catch (e) {}
+
     var gameState = {
         bankroll: 1000,
         wins: 0,
         losses: 0,
         pushes: 0,
+        gamesPlayed: 0,
+        peakBankroll: 1000,
         awayTeam: null,
         homeTeam: null,
         spread: 0,
         wager: 100,
-        locked: false
+        locked: false,
+        bestRun: savedBest || { peak: 0, games: 0 }
     };
 
     var bankrollEl = document.getElementById('gameBankroll');
     var recordEl = document.getElementById('gameRecord');
+    var bestRunEl = document.getElementById('gameBestRun');
     var matchupHeaderEl = document.getElementById('matchupHeader');
     var awayNameEl = document.getElementById('awayName');
     var homeNameEl = document.getElementById('homeName');
@@ -201,6 +219,25 @@
     var newBtn = document.getElementById('gameNewBtn');
     var wagerInput = document.getElementById('wagerInput');
     var wagerPresets = document.querySelectorAll('.wager-preset');
+
+    function updateBestRunDisplay() {
+        if (gameState.bestRun.peak > 0) {
+            bestRunEl.textContent = '$' + gameState.bestRun.peak.toLocaleString() + ' (' + gameState.bestRun.games + ' bets)';
+        } else {
+            bestRunEl.textContent = '--';
+        }
+    }
+
+    function saveBestRun() {
+        if (gameState.bankroll > gameState.bestRun.peak) {
+            gameState.bestRun.peak = gameState.bankroll;
+            gameState.bestRun.games = gameState.gamesPlayed;
+            try { localStorage.setItem('btsbestrun', JSON.stringify(gameState.bestRun)); } catch (e) {}
+            updateBestRunDisplay();
+        }
+    }
+
+    updateBestRunDisplay();
 
     function pickTwo() {
         var shuffled = nflTeams.slice();
@@ -334,6 +371,7 @@
             }
 
             // Update bankroll
+            gameState.gamesPlayed++;
             if (isPush) {
                 gameState.pushes++;
             } else if (userWon) {
@@ -347,6 +385,7 @@
             bankrollEl.textContent = '$' + gameState.bankroll.toLocaleString();
             bankrollEl.className = 'game-bankroll-value' + (gameState.bankroll < 1000 ? ' negative' : '');
             recordEl.textContent = gameState.wins + '-' + gameState.losses + (gameState.pushes > 0 ? '-' + gameState.pushes : '');
+            saveBestRun();
 
             // Color code by who covered
             if (coverMargin > 0) {
@@ -392,6 +431,7 @@
                 gameState.wins = 0;
                 gameState.losses = 0;
                 gameState.pushes = 0;
+                gameState.gamesPlayed = 0;
                 bankrollEl.textContent = '$1,000';
                 bankrollEl.className = 'game-bankroll-value';
                 recordEl.textContent = '0-0';

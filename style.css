@@ -414,12 +414,28 @@ section {
     align-items: start;
 }
 
+.about-intro {
+    display: flex;
+    align-items: flex-start;
+    gap: 24px;
+    margin-bottom: 48px;
+}
+
+.about-photo {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--border-light);
+    flex-shrink: 0;
+}
+
 .about-lead {
     font-size: 1.25rem;
     color: var(--text);
-    margin-bottom: 48px;
     line-height: 1.7;
     font-weight: 400;
+    margin: 0;
 }
 
 .timeline {
@@ -854,25 +870,101 @@ section {
     flex-direction: column;
     align-items: center;
     gap: 24px;
+    max-width: 640px;
+    margin: 0 auto;
 }
 
-.game-bankroll {
+/* Explainer */
+.game-explainer {
+    width: 100%;
+}
+
+.game-explainer-toggle {
     display: flex;
-    align-items: baseline;
-    gap: 12px;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    padding: 12px 20px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--text-muted);
+    font-family: var(--font);
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
 }
 
-.game-bankroll-label {
-    font-size: 0.8rem;
+.game-explainer-toggle:hover {
+    border-color: var(--border-light);
+    color: var(--text);
+}
+
+.explainer-arrow {
+    font-size: 0.7rem;
+    transition: transform 0.3s;
+}
+
+.explainer-arrow.open {
+    transform: rotate(180deg);
+}
+
+.game-explainer-content {
+    display: none;
+    padding: 20px 24px;
+    margin-top: 8px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+}
+
+.game-explainer-content.open {
+    display: block;
+}
+
+.game-explainer-content p {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    line-height: 1.7;
+    margin-bottom: 12px;
+}
+
+.game-explainer-content p:last-child {
+    margin-bottom: 0;
+}
+
+.game-explainer-content strong {
+    color: var(--text);
+}
+
+/* Stats Row */
+.game-stats-row {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    width: 100%;
+    flex-wrap: wrap;
+}
+
+.game-stat-block {
+    text-align: center;
+}
+
+.game-stat-label {
+    display: block;
+    font-size: 0.7rem;
     color: var(--text-dim);
     text-transform: uppercase;
     letter-spacing: 0.08em;
     font-weight: 600;
+    margin-bottom: 4px;
 }
 
 .game-bankroll-value {
     font-family: var(--mono);
-    font-size: 2.5rem;
+    font-size: 2rem;
     font-weight: 800;
     color: var(--accent);
     letter-spacing: -0.02em;
@@ -883,53 +975,71 @@ section {
     color: var(--negative);
 }
 
-.game-record {
+.game-stat-value {
     font-family: var(--mono);
-    font-size: 0.85rem;
-    color: var(--text-muted);
-    font-weight: 500;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text);
 }
 
+.game-stat-best {
+    color: var(--accent);
+}
+
+/* Game Card */
 .game-card {
     background: var(--bg-card);
     border: 1px solid var(--border);
     border-radius: 16px;
-    padding: 40px;
+    padding: 32px;
     width: 100%;
-    max-width: 640px;
     transition: border-color 0.3s;
+}
+
+.game-matchup-header {
+    text-align: center;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    letter-spacing: 0.02em;
+    margin-bottom: 24px;
 }
 
 .game-matchup {
     display: grid;
     grid-template-columns: 1fr auto 1fr;
-    gap: 20px;
-    align-items: center;
+    gap: 16px;
+    align-items: stretch;
 }
 
 .game-team {
     background: var(--bg);
     border: 2px solid var(--border);
     border-radius: 12px;
-    padding: 28px 20px;
+    padding: 24px 16px;
     cursor: pointer;
     transition: all 0.25s ease;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 8px;
+    justify-content: center;
+    gap: 6px;
     color: var(--text);
     font-family: var(--font);
 }
 
-.game-team:hover {
+.game-team:not(:disabled):hover {
     border-color: var(--accent);
     background: var(--accent-glow);
     transform: translateY(-2px);
 }
 
-.game-team:active {
+.game-team:not(:disabled):active {
     transform: translateY(0);
+}
+
+.game-team:disabled {
+    cursor: default;
 }
 
 .game-team.selected {
@@ -949,36 +1059,25 @@ section {
     opacity: 0.6;
 }
 
-.game-team:disabled {
-    cursor: default;
-}
-
-.game-team:disabled:hover {
-    transform: none;
+.game-team-label {
+    font-size: 0.65rem;
+    font-weight: 600;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
 }
 
 .game-team-name {
-    font-size: 1rem;
+    font-size: 1.05rem;
     font-weight: 700;
     letter-spacing: -0.01em;
 }
 
 .game-team-spread {
     font-family: var(--mono);
-    font-size: 1.4rem;
+    font-size: 1.5rem;
     font-weight: 700;
     color: var(--accent);
-}
-
-.game-matchup-header {
-    text-align: center;
-    font-size: 0.8rem;
-    font-weight: 600;
-    color: var(--text-muted);
-    letter-spacing: 0.05em;
-    margin-bottom: 20px;
-    padding-bottom: 16px;
-    border-bottom: 1px solid var(--border);
 }
 
 .game-vs {
@@ -986,16 +1085,16 @@ section {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 4px;
+    justify-content: center;
 }
 
 .game-vs span {
-    font-size: 0.85rem;
+    font-size: 0.9rem;
     font-weight: 800;
     color: var(--text-dim);
-    letter-spacing: 0.05em;
 }
 
+/* Wager Controls */
 .game-wager {
     margin-top: 24px;
     padding-top: 20px;
@@ -1004,7 +1103,7 @@ section {
 
 .game-wager-label {
     display: block;
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     font-weight: 600;
     color: var(--text-dim);
     text-transform: uppercase;
@@ -1085,6 +1184,7 @@ section {
     border-color: var(--accent);
 }
 
+/* Results */
 .game-result {
     text-align: center;
     margin-top: 24px;
@@ -1093,7 +1193,7 @@ section {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 4px;
+    gap: 8px;
 }
 
 .game-result-score {
@@ -1107,8 +1207,8 @@ section {
     font-family: var(--mono);
     font-size: 0.85rem;
     font-weight: 700;
-    padding: 4px 14px;
-    border-radius: 4px;
+    padding: 6px 16px;
+    border-radius: 6px;
     letter-spacing: 0.05em;
 }
 
@@ -1140,15 +1240,18 @@ section {
 
     .game-vs {
         flex-direction: row;
-        gap: 12px;
     }
 
     .game-card {
-        padding: 24px;
+        padding: 20px;
     }
 
     .game-bankroll-value {
-        font-size: 2rem;
+        font-size: 1.6rem;
+    }
+
+    .game-stats-row {
+        gap: 24px;
     }
 
     .game-wager-controls {
@@ -1158,6 +1261,10 @@ section {
     .wager-preset {
         padding: 6px 10px;
         font-size: 0.7rem;
+    }
+
+    .game-explainer-content {
+        padding: 16px;
     }
 }
 
