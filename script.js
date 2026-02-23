@@ -278,14 +278,17 @@
         return Math.round(expectedMargin + noise);
     }
 
-    function generateScores(margin) {
-        // Generate realistic NFL scores
-        var base = Math.floor(Math.random() * 14) + 14;
-        var winner = base + Math.abs(margin);
+    function generateScores(margin, home, away) {
+        // Adjust base score by average team rating (higher rating = better defense = lower scores)
+        var avgRating = (home.rating + away.rating) / 2;
+        var base = Math.round(21 - avgRating * 0.5 + (Math.random() * 6 - 3));
+        base = Math.max(10, Math.min(base, 30));
+        var loser = base;
+        var winner = loser + Math.abs(margin);
         if (margin >= 0) {
-            return { home: winner, away: base };
+            return { home: winner, away: loser };
         } else {
-            return { home: base, away: winner };
+            return { home: loser, away: winner };
         }
     }
 
@@ -353,7 +356,7 @@
 
         setTimeout(function () {
             var margin = simulateGame(gameState.homeTeam, gameState.awayTeam);
-            var scores = generateScores(margin);
+            var scores = generateScores(margin, gameState.homeTeam, gameState.awayTeam);
 
             // ATS result: positive coverMargin = home covers
             var coverMargin = margin - gameState.spread;
