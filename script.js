@@ -476,13 +476,15 @@
             var outcomeText = isPush ? 'PUSH — ' + wagerStr + ' returned' : (userWon ? 'WIN +' + wagerStr : 'LOSS -' + wagerStr);
 
             // Fair value comparison: show what the line should have been
+            // Use full precision for fair value so the difference from posted line is visible
             var trueSpr   = gameState.trueSpread; // positive = home favored
             var postedSpr = gameState.spread;
             var edge      = trueSpr - postedSpr;  // positive = home undervalued
             var edgePts   = Math.abs(edge).toFixed(1);
             var edgeSide  = edge > 0 ? gameState.homeTeam.name : gameState.awayTeam.name;
-            var fairStr   = formatSpread(Math.round(-trueSpr   * 2) / 2); // home team's fair spread
-            var postedStr = formatSpread(Math.round(-postedSpr * 2) / 2); // home team's posted spread
+            var fairRounded = Math.round(-trueSpr * 10) / 10; // 1 decimal precision
+            var fairStr   = Math.abs(fairRounded) < 0.05 ? 'PK' : (fairRounded > 0 ? '+' : '-') + Math.abs(fairRounded).toFixed(1);
+            var postedStr = formatSpread(-postedSpr); // already rounded to 0.5
             var fairValueHTML =
                 '<span class="game-fair-value">' +
                 'Fair Value: ' + gameState.homeTeam.name + ' ' + fairStr +
