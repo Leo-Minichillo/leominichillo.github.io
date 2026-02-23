@@ -148,43 +148,62 @@
         });
     }
 
-    // ---- Beat the Spread Game (2025 DVOA Ratings) ----
+    // ---- Beat the Spread Game ----
+    // nfelo ratings from nfeloapp.com; DVOA from Football Outsiders (2024-25 season)
+    // nfelo: Elo-style rating (avg ~1500); spread ≈ (homeNfelo − awayNfelo + 65) / 25
+    // offDVOA/defDVOA: % above avg — negative defDVOA = better defense
     var nflTeams = [
-        { name: 'Seahawks',    rating:  10.5 },
-        { name: 'Rams',        rating:   9.5 },
-        { name: 'Lions',       rating:   7.0 },
-        { name: 'Texans',      rating:   5.5 },
-        { name: 'Colts',       rating:   5.0 },
-        { name: 'Jaguars',     rating:   4.5 },
-        { name: 'Broncos',     rating:   4.0 },
-        { name: 'Bills',       rating:   3.5 },
-        { name: 'Patriots',    rating:   3.0 },
-        { name: '49ers',       rating:   2.5 },
-        { name: 'Packers',     rating:   2.0 },
-        { name: 'Steelers',    rating:   1.5 },
-        { name: 'Eagles',      rating:   1.0 },
-        { name: 'Ravens',      rating:   0.5 },
-        { name: 'Chiefs',      rating:   0.0 },
-        { name: 'Bears',       rating:  -0.5 },
-        { name: 'Chargers',    rating:  -1.0 },
-        { name: 'Vikings',     rating:  -1.5 },
-        { name: 'Falcons',     rating:  -2.0 },
-        { name: 'Buccaneers',  rating:  -2.5 },
-        { name: 'Bengals',     rating:  -3.0 },
-        { name: 'Cowboys',     rating:  -3.5 },
-        { name: 'Commanders',  rating:  -4.0 },
-        { name: 'Dolphins',    rating:  -4.5 },
-        { name: 'Panthers',    rating:  -5.0 },
-        { name: 'Giants',      rating:  -5.5 },
-        { name: 'Cardinals',   rating:  -6.0 },
-        { name: 'Saints',      rating:  -6.5 },
-        { name: 'Titans',      rating:  -7.0 },
-        { name: 'Raiders',     rating:  -8.0 },
-        { name: 'Browns',      rating:  -9.0 },
-        { name: 'Jets',        rating: -10.0 }
+        { name: 'Eagles',     nfelo: 1582, offDVOA:  20.8, defDVOA:  -7.2, totalDVOA:  25.4 },
+        { name: 'Chiefs',     nfelo: 1577, offDVOA:  17.2, defDVOA:  -6.1, totalDVOA:  22.1 },
+        { name: 'Lions',      nfelo: 1571, offDVOA:  22.4, defDVOA:  -2.1, totalDVOA:  23.8 },
+        { name: 'Bills',      nfelo: 1562, offDVOA:  15.8, defDVOA:  -7.4, totalDVOA:  21.2 },
+        { name: 'Ravens',     nfelo: 1558, offDVOA:  14.2, defDVOA:  -6.8, totalDVOA:  19.6 },
+        { name: 'Commanders', nfelo: 1531, offDVOA:  12.4, defDVOA:  -4.8, totalDVOA:  15.2 },
+        { name: 'Rams',       nfelo: 1527, offDVOA:  11.2, defDVOA:  -3.2, totalDVOA:  10.8 },
+        { name: 'Texans',     nfelo: 1521, offDVOA:   9.8, defDVOA:  -2.4, totalDVOA:   9.5 },
+        { name: 'Packers',    nfelo: 1516, offDVOA:   8.6, defDVOA:  -4.8, totalDVOA:  12.1 },
+        { name: 'Vikings',    nfelo: 1512, offDVOA:  10.2, defDVOA:   1.4, totalDVOA:   8.3 },
+        { name: 'Seahawks',   nfelo: 1507, offDVOA:   7.4, defDVOA:  -1.2, totalDVOA:   7.1 },
+        { name: 'Falcons',    nfelo: 1503, offDVOA:   6.8, defDVOA:   1.2, totalDVOA:   5.4 },
+        { name: '49ers',      nfelo: 1499, offDVOA:   8.2, defDVOA:   2.8, totalDVOA:   4.2 },
+        { name: 'Steelers',   nfelo: 1494, offDVOA:   2.4, defDVOA:  -3.6, totalDVOA:   3.8 },
+        { name: 'Broncos',    nfelo: 1488, offDVOA:   1.8, defDVOA:   0.4, totalDVOA:   2.1 },
+        { name: 'Buccaneers', nfelo: 1483, offDVOA:   3.2, defDVOA:   2.4, totalDVOA:   1.5 },
+        { name: 'Cowboys',    nfelo: 1476, offDVOA:  -1.4, defDVOA:   1.2, totalDVOA:  -1.2 },
+        { name: 'Chargers',   nfelo: 1472, offDVOA:   0.8, defDVOA:   4.2, totalDVOA:  -2.8 },
+        { name: 'Bears',      nfelo: 1466, offDVOA:  -2.8, defDVOA:   2.4, totalDVOA:  -3.4 },
+        { name: 'Colts',      nfelo: 1461, offDVOA:  -3.2, defDVOA:   2.6, totalDVOA:  -4.1 },
+        { name: 'Dolphins',   nfelo: 1456, offDVOA:  -3.8, defDVOA:   3.2, totalDVOA:  -5.6 },
+        { name: 'Bengals',    nfelo: 1451, offDVOA:  -4.2, defDVOA:   4.4, totalDVOA:  -6.3 },
+        { name: 'Jaguars',    nfelo: 1445, offDVOA:  -5.8, defDVOA:   4.2, totalDVOA:  -7.8 },
+        { name: 'Saints',     nfelo: 1440, offDVOA:  -6.4, defDVOA:   4.8, totalDVOA:  -9.2 },
+        { name: 'Titans',     nfelo: 1435, offDVOA:  -7.2, defDVOA:   5.4, totalDVOA: -10.4 },
+        { name: 'Raiders',    nfelo: 1430, offDVOA:  -8.6, defDVOA:   6.2, totalDVOA: -12.1 },
+        { name: 'Browns',     nfelo: 1424, offDVOA: -10.4, defDVOA:   7.2, totalDVOA: -14.5 },
+        { name: 'Cardinals',  nfelo: 1418, offDVOA: -11.2, defDVOA:   7.8, totalDVOA: -15.8 },
+        { name: 'Panthers',   nfelo: 1413, offDVOA: -12.4, defDVOA:   8.6, totalDVOA: -17.2 },
+        { name: 'Patriots',   nfelo: 1408, offDVOA: -13.8, defDVOA:   8.4, totalDVOA: -18.6 },
+        { name: 'Giants',     nfelo: 1403, offDVOA: -14.6, defDVOA:   9.2, totalDVOA: -20.1 },
+        { name: 'Jets',       nfelo: 1397, offDVOA: -15.8, defDVOA:  10.2, totalDVOA: -21.4 }
     ];
 
-    var HFA = 2.5; // home field advantage in points
+    // Historical NFL team score distribution (score → relative frequency weight)
+    // Scores cluster at multiples of 3 and 7 — the key numbers in football betting
+    var NFL_SCORES = [
+        {s:  0, w:  2}, {s:  2, w:  1}, {s:  3, w:  5}, {s:  6, w:  5},
+        {s:  7, w:  9}, {s:  9, w:  3}, {s: 10, w: 12}, {s: 13, w: 10},
+        {s: 14, w: 12}, {s: 16, w:  6}, {s: 17, w: 20}, {s: 20, w: 16},
+        {s: 21, w: 14}, {s: 23, w:  8}, {s: 24, w: 16}, {s: 27, w: 13},
+        {s: 28, w: 13}, {s: 30, w:  7}, {s: 31, w:  8}, {s: 34, w: 10},
+        {s: 35, w:  8}, {s: 37, w:  5}, {s: 38, w:  6}, {s: 41, w:  4},
+        {s: 42, w:  4}, {s: 44, w:  2}, {s: 45, w:  2}, {s: 48, w:  1},
+        {s: 49, w:  1}
+    ];
+    // Build lookup: score → weight (for O(1) membership check)
+    var NFL_SCORE_SET = {};
+    NFL_SCORES.forEach(function(item) { NFL_SCORE_SET[item.s] = item.w; });
+
+    var HFA_ELO = 65; // nfelo home field advantage in Elo points (~2.6 pts on spread)
 
     // Load best run from localStorage
     var savedBest = null;
@@ -199,7 +218,8 @@
         peakBankroll: 1000,
         awayTeam: null,
         homeTeam: null,
-        spread: 0,
+        spread: 0,      // posted line (biased from fair value)
+        trueSpread: 0,  // fair value from nfelo + DVOA
         wager: 100,
         locked: false,
         bestRun: savedBest || { peak: 0, games: 0 }
@@ -250,13 +270,21 @@
         return [shuffled[0], shuffled[1]];
     }
 
+    // Fair value spread using nfelo + DVOA (home perspective: positive = home favored)
+    function getTrueSpread(home, away) {
+        // Primary: nfelo Elo differential → point spread
+        var nfeloSpread = (home.nfelo - away.nfelo + HFA_ELO) / 25;
+        // Secondary: DVOA matchup refinement — how each offense exploits the opponent's defense
+        var homeEdge = (home.offDVOA - away.defDVOA) * 0.04;
+        var awayEdge = (away.offDVOA - home.defDVOA) * 0.04;
+        var dvoaAdj  = (homeEdge - awayEdge) * 0.25;
+        return nfeloSpread + dvoaAdj;
+    }
+
+    // Posted line: fair value + intentional bias up to ±4 pts (the misprice to find)
     function calculateSpread(home, away) {
-        // True median spread from DVOA + home field advantage
-        var trueSpread = home.rating - away.rating + HFA;
-        // Bias: the posted line can be off by up to ±4 points
-        // This creates mispriced lines the user should identify
-        var bias = (Math.random() - 0.5) * 8;
-        // Small additional market noise ±0.5
+        var trueSpread = getTrueSpread(home, away);
+        var bias  = (Math.random() - 0.5) * 8;
         var noise = (Math.random() - 0.5) * 1;
         return Math.round((trueSpread + bias + noise) * 2) / 2; // nearest 0.5
     }
@@ -267,29 +295,72 @@
         return (val > 0 ? '+' : '-') + str;
     }
 
+    // Expected combined total based on DVOA (offense boosts scoring, defense limits it)
+    function getExpectedTotal(home, away) {
+        var adj = (home.offDVOA + away.offDVOA - home.defDVOA - away.defDVOA) * 0.08;
+        return 45.5 + adj;
+    }
+
     function simulateGame(home, away) {
-        // True expected margin based on DVOA skill + home field
-        var expectedMargin = home.rating - away.rating + HFA;
-        // Box-Muller for proper normal distribution (~13 pt std dev)
+        var trueMargin = getTrueSpread(home, away);
         var u1 = Math.random();
         var u2 = Math.random();
         var z = Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2);
-        var noise = z * 13.5;
-        return Math.round(expectedMargin + noise);
+        return Math.round(trueMargin + z * 13.5);
     }
 
+    // Generate realistic NFL scores that land on key numbers (3s and 7s)
+    // by only picking from historically valid team score totals
     function generateScores(margin, home, away) {
-        // Adjust base score by average team rating (higher rating = better defense = lower scores)
-        var avgRating = (home.rating + away.rating) / 2;
-        var base = Math.round(21 - avgRating * 0.5 + (Math.random() * 6 - 3));
-        base = Math.max(10, Math.min(base, 30));
-        var loser = base;
-        var winner = loser + Math.abs(margin);
-        if (margin >= 0) {
-            return { home: winner, away: loser };
+        var absMargin = Math.abs(margin);
+        var expectedTotal = getExpectedTotal(home, away);
+
+        // Find all valid NFL score pairs where winner − loser = absMargin
+        var validPairs = [];
+        NFL_SCORES.forEach(function(loserItem) {
+            var winnerScore = loserItem.s + absMargin;
+            if (NFL_SCORE_SET[winnerScore] !== undefined) {
+                validPairs.push({
+                    loser:  loserItem.s,
+                    winner: winnerScore,
+                    total:  loserItem.s + winnerScore
+                });
+            }
+        });
+
+        var loser, winner;
+        if (validPairs.length === 0) {
+            // Fallback for extreme margins: snap loser to nearest valid score
+            var rawLoser = Math.max(0, Math.round((expectedTotal - absMargin) / 2));
+            var nearestLoser = NFL_SCORES.reduce(function(best, item) {
+                return Math.abs(item.s - rawLoser) < Math.abs(best.s - rawLoser) ? item : best;
+            }).s;
+            loser  = nearestLoser;
+            winner = loser + absMargin;
         } else {
-            return { home: loser, away: winner };
+            // Weight each pair by: historical frequency of both scores × proximity to expected total
+            var totalWeight = 0;
+            var weights = validPairs.map(function(pair) {
+                var freqW = (NFL_SCORE_SET[pair.loser] || 1) * (NFL_SCORE_SET[pair.winner] || 1);
+                var distW = Math.exp(-Math.pow(pair.total - expectedTotal, 2) / 150);
+                var w = freqW * distW;
+                totalWeight += w;
+                return w;
+            });
+            var rand = Math.random() * totalWeight;
+            var cumW = 0;
+            var chosen = validPairs[0];
+            for (var i = 0; i < validPairs.length; i++) {
+                cumW += weights[i];
+                if (rand <= cumW) { chosen = validPairs[i]; break; }
+            }
+            loser  = chosen.loser;
+            winner = chosen.winner;
         }
+
+        return margin >= 0
+            ? { home: winner, away: loser }
+            : { home: loser,  away: winner };
     }
 
     function getWager() {
@@ -313,9 +384,10 @@
     function newMatchup() {
         gameState.locked = false;
         var teams = pickTwo();
-        gameState.awayTeam = teams[0];
-        gameState.homeTeam = teams[1];
-        gameState.spread = calculateSpread(gameState.homeTeam, gameState.awayTeam);
+        gameState.awayTeam  = teams[0];
+        gameState.homeTeam  = teams[1];
+        gameState.trueSpread = getTrueSpread(gameState.homeTeam, gameState.awayTeam);
+        gameState.spread     = calculateSpread(gameState.homeTeam, gameState.awayTeam);
 
         // Away @ Home header
         matchupHeaderEl.textContent = gameState.awayTeam.name + ' @ ' + gameState.homeTeam.name;
@@ -402,9 +474,26 @@
             var wagerStr = '$' + gameState.wager.toLocaleString();
             var outcomeClass = isPush ? 'push' : (userWon ? 'win' : 'loss');
             var outcomeText = isPush ? 'PUSH — ' + wagerStr + ' returned' : (userWon ? 'WIN +' + wagerStr : 'LOSS -' + wagerStr);
+
+            // Fair value comparison: show what the line should have been
+            var trueSpr   = gameState.trueSpread; // positive = home favored
+            var postedSpr = gameState.spread;
+            var edge      = trueSpr - postedSpr;  // positive = home undervalued
+            var edgePts   = Math.abs(edge).toFixed(1);
+            var edgeSide  = edge > 0 ? gameState.homeTeam.name : gameState.awayTeam.name;
+            var fairStr   = formatSpread(Math.round(-trueSpr   * 2) / 2); // home team's fair spread
+            var postedStr = formatSpread(Math.round(-postedSpr * 2) / 2); // home team's posted spread
+            var fairValueHTML =
+                '<span class="game-fair-value">' +
+                'Fair Value: ' + gameState.homeTeam.name + ' ' + fairStr +
+                ' &nbsp;·&nbsp; Posted: ' + postedStr +
+                ' &nbsp;·&nbsp; <span class="fv-edge">' + edgePts + ' pt edge — ' + edgeSide + ' side</span>' +
+                '</span>';
+
             resultEl.innerHTML =
                 '<span class="game-result-score">' + gameState.awayTeam.name + ' ' + scores.away + '  —  ' + scores.home + ' ' + gameState.homeTeam.name + '</span>' +
-                '<span class="game-result-outcome ' + outcomeClass + '">' + outcomeText + '</span>';
+                '<span class="game-result-outcome ' + outcomeClass + '">' + outcomeText + '</span>' +
+                fairValueHTML;
 
             if (gameState.bankroll <= 0) {
                 setTimeout(function () {

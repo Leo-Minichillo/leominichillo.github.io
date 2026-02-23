@@ -1227,6 +1227,22 @@ section {
     background: rgba(251, 191, 36, 0.1);
 }
 
+.game-fair-value {
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-top: 4px;
+    padding: 6px 10px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 6px;
+    letter-spacing: 0.02em;
+}
+
+.fv-edge {
+    color: #fbbf24;
+}
+
 .game-deal-btn {
     font-size: 0.9rem;
     padding: 14px 36px;
