@@ -334,32 +334,35 @@ a {
     transform: translateY(-1px);
 }
 
-.scroll-indicator {
+.trend-line-wrapper {
     position: absolute;
-    bottom: 32px;
-    left: 50%;
-    transform: translateX(-50%);
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 70%;
+    pointer-events: none;
+    z-index: 0;
 }
 
 .trend-line {
-    width: 180px;
-    height: 64px;
+    width: 100%;
+    height: 100%;
 }
 
 .trend-line-fill {
     opacity: 0;
-    animation: fadeInFill 1s ease-out 1.8s forwards;
+    animation: fadeInFill 1.2s ease-out 2s forwards;
 }
 
 .trend-line-path {
-    stroke-dasharray: 280;
-    stroke-dashoffset: 280;
-    animation: drawLine 2.2s ease-out forwards;
+    stroke-dasharray: 2000;
+    stroke-dashoffset: 2000;
+    animation: drawLine 3s ease-out forwards;
 }
 
 .trend-line-dot {
     opacity: 0;
-    animation: dotAppear 0.3s ease-out 2.2s forwards, dotPulse 2.5s ease-in-out 2.5s infinite;
+    animation: dotAppear 0.4s ease-out 3s forwards, dotPulse 2.5s ease-in-out 3.4s infinite;
 }
 
 @keyframes drawLine {
@@ -375,8 +378,8 @@ a {
 }
 
 @keyframes dotPulse {
-    0%, 100% { r: 3; opacity: 0.8; }
-    50% { r: 5; opacity: 1; filter: drop-shadow(0 0 6px #10b981); }
+    0%, 100% { r: 5; opacity: 0.8; }
+    50% { r: 8; opacity: 1; }
 }
 
 /* ---- Sections Common ---- */
@@ -967,6 +970,17 @@ section {
     color: var(--accent);
 }
 
+.game-matchup-header {
+    text-align: center;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    letter-spacing: 0.05em;
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+}
+
 .game-vs {
     text-align: center;
     display: flex;
@@ -976,17 +990,99 @@ section {
 }
 
 .game-vs span {
-    font-size: 0.75rem;
+    font-size: 0.85rem;
     font-weight: 800;
     color: var(--text-dim);
-    letter-spacing: 0.15em;
+    letter-spacing: 0.05em;
 }
 
-.game-bet-amount {
-    font-family: var(--mono);
-    font-size: 0.65rem;
+.game-wager {
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+}
+
+.game-wager-label {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 600;
     color: var(--text-dim);
-    white-space: nowrap;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 12px;
+    text-align: center;
+}
+
+.game-wager-controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.wager-preset {
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 8px 14px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.wager-preset:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+.wager-preset.active {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: var(--accent-glow);
+}
+
+.game-wager-input-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.wager-dollar {
+    position: absolute;
+    left: 10px;
+    font-family: var(--mono);
+    font-size: 0.85rem;
+    color: var(--text-dim);
+    pointer-events: none;
+}
+
+.game-wager-input {
+    font-family: var(--mono);
+    font-size: 0.85rem;
+    font-weight: 600;
+    width: 90px;
+    padding: 8px 10px 8px 22px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.2s;
+    -moz-appearance: textfield;
+}
+
+.game-wager-input::-webkit-outer-spin-button,
+.game-wager-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.game-wager-input:focus {
+    border-color: var(--accent);
 }
 
 .game-result {
@@ -1053,6 +1149,15 @@ section {
 
     .game-bankroll-value {
         font-size: 2rem;
+    }
+
+    .game-wager-controls {
+        gap: 6px;
+    }
+
+    .wager-preset {
+        padding: 6px 10px;
+        font-size: 0.7rem;
     }
 }
 

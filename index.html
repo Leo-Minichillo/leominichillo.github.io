@@ -67,21 +67,22 @@
                 <a href="https://polymarket.com/profile/0xc42e3Ad86BD9233631b5d494D29eA8aCaa25EdBd" class="btn btn-outline" target="_blank" rel="noopener">Polymarket &nearr;</a>
             </div>
         </div>
-        <div class="scroll-indicator">
-            <svg class="trend-line" viewBox="0 0 200 70" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <div class="trend-line-wrapper">
+            <svg class="trend-line" viewBox="0 0 1000 400" preserveAspectRatio="none" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <defs>
                     <linearGradient id="lineGrad" x1="0" y1="0" x2="1" y2="0">
-                        <stop offset="0%" stop-color="#10b981" stop-opacity="0.4"/>
+                        <stop offset="0%" stop-color="#10b981" stop-opacity="0"/>
+                        <stop offset="15%" stop-color="#10b981" stop-opacity="0.5"/>
                         <stop offset="100%" stop-color="#10b981"/>
                     </linearGradient>
                     <linearGradient id="fillGrad" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stop-color="#10b981" stop-opacity="0.15"/>
+                        <stop offset="0%" stop-color="#10b981" stop-opacity="0.12"/>
                         <stop offset="100%" stop-color="#10b981" stop-opacity="0"/>
                     </linearGradient>
                 </defs>
-                <path class="trend-line-fill" d="M 4 64 C 18 60, 30 56, 42 50 C 54 44, 58 46, 72 38 C 86 30, 90 33, 106 24 C 122 15, 134 17, 152 10 C 164 5, 180 3, 196 3 L 196 68 L 4 68 Z" fill="url(#fillGrad)" />
-                <path class="trend-line-path" d="M 4 64 C 18 60, 30 56, 42 50 C 54 44, 58 46, 72 38 C 86 30, 90 33, 106 24 C 122 15, 134 17, 152 10 C 164 5, 180 3, 196 3" stroke="url(#lineGrad)" stroke-width="2.5" stroke-linecap="round" fill="none" />
-                <circle class="trend-line-dot" cx="196" cy="3" r="3" fill="#10b981" />
+                <path class="trend-line-fill" d="M 0 380 C 50 375, 80 370, 120 360 C 160 348, 200 355, 250 340 C 300 322, 330 330, 380 305 C 430 280, 460 290, 520 260 C 580 230, 600 240, 660 200 C 720 160, 750 170, 800 130 C 850 90, 880 100, 920 60 C 950 35, 975 20, 1000 15 L 1000 400 L 0 400 Z" fill="url(#fillGrad)" />
+                <path class="trend-line-path" d="M 0 380 C 50 375, 80 370, 120 360 C 160 348, 200 355, 250 340 C 300 322, 330 330, 380 305 C 430 280, 460 290, 520 260 C 580 230, 600 240, 660 200 C 720 160, 750 170, 800 130 C 850 90, 880 100, 920 60 C 950 35, 975 20, 1000 15" stroke="url(#lineGrad)" stroke-width="3" stroke-linecap="round" fill="none" />
+                <circle class="trend-line-dot" cx="1000" cy="15" r="5" fill="#10b981" />
             </svg>
         </div>
     </section>
@@ -168,7 +169,7 @@
                             <p class="career-company">Fanatics Betting &amp; Gaming</p>
                         </div>
                     </div>
-                    <p class="career-description">Trading across general sports markets. Leveraging data science and quantitative analysis to manage risk and find value in sports betting markets.</p>
+                    <p class="career-description">Market operations supporting the pricing, integrity, and availability of sportsbook markets across professional and collegiate sports. Monitoring live and pre-match markets, reviewing line movements, conducting customer bet reviews, and building SQL-based reporting workflows to track performance and surface pricing anomalies.</p>
                 </div>
             </div>
             <div class="career-education">
@@ -348,7 +349,7 @@
             <div class="section-header">
                 <span class="section-tag">05</span>
                 <h2>Beat the Spread</h2>
-                <p style="color: var(--text-dim); font-size: 0.85rem; margin-top: 8px;">Lines powered by 2025 DVOA ratings</p>
+                <p style="color: var(--text-dim); font-size: 0.85rem; margin-top: 8px;">Lines powered by 2025 DVOA ratings &mdash; spot the mispriced spreads and size your bets</p>
             </div>
             <div class="game-wrapper">
                 <div class="game-bankroll">
@@ -357,19 +358,32 @@
                 </div>
                 <div class="game-record" id="gameRecord">0-0</div>
                 <div class="game-card" id="gameCard">
+                    <div class="game-matchup-header" id="matchupHeader">-- @ --</div>
                     <div class="game-matchup">
                         <button class="game-team" id="awayTeam" data-side="away">
                             <span class="game-team-name" id="awayName">--</span>
                             <span class="game-team-spread" id="awaySpread">--</span>
                         </button>
                         <div class="game-vs">
-                            <span>VS</span>
-                            <div class="game-bet-amount">$100 / bet</div>
+                            <span>@</span>
                         </div>
                         <button class="game-team" id="homeTeam" data-side="home">
                             <span class="game-team-name" id="homeName">--</span>
                             <span class="game-team-spread" id="homeSpread">--</span>
                         </button>
+                    </div>
+                    <div class="game-wager">
+                        <label class="game-wager-label" for="wagerInput">Wager</label>
+                        <div class="game-wager-controls">
+                            <button class="wager-preset" data-amount="50">$50</button>
+                            <button class="wager-preset" data-amount="100">$100</button>
+                            <button class="wager-preset" data-amount="250">$250</button>
+                            <button class="wager-preset" data-amount="500">$500</button>
+                            <div class="game-wager-input-wrap">
+                                <span class="wager-dollar">$</span>
+                                <input type="number" id="wagerInput" class="game-wager-input" value="100" min="1" step="1">
+                            </div>
+                        </div>
                     </div>
                     <div class="game-result" id="gameResult"></div>
                 </div>

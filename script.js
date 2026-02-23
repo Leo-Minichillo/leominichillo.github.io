@@ -138,40 +138,40 @@
 
     // ---- Beat the Spread Game (2025 DVOA Ratings) ----
     // Point ratings derived from final 2025 FTN DVOA rankings
-    // Positive = above average, negative = below average
+    // These represent true team skill — the simulation uses these directly
     var nflTeams = [
-        { name: 'Seahawks',    rating:  10.5 },  // DVOA #1
-        { name: 'Rams',        rating:   9.5 },  // DVOA #2
-        { name: 'Lions',       rating:   7.0 },  // DVOA #3
-        { name: 'Texans',      rating:   5.5 },  // DVOA #4
-        { name: 'Colts',       rating:   5.0 },  // DVOA #5
-        { name: 'Jaguars',     rating:   4.5 },  // DVOA #6
-        { name: 'Broncos',     rating:   4.0 },  // DVOA #7
-        { name: 'Bills',       rating:   3.5 },  // DVOA #8
-        { name: 'Patriots',    rating:   3.0 },  // DVOA #9
-        { name: '49ers',       rating:   2.5 },  // DVOA #10
-        { name: 'Packers',     rating:   2.0 },  // DVOA #11
-        { name: 'Steelers',    rating:   1.5 },  // DVOA #12
-        { name: 'Eagles',      rating:   1.0 },  // DVOA #13
-        { name: 'Ravens',      rating:   0.5 },  // DVOA #14
-        { name: 'Chiefs',      rating:   0.0 },  // DVOA #15
-        { name: 'Bears',       rating:  -0.5 },  // DVOA #16
-        { name: 'Chargers',    rating:  -1.0 },  // DVOA #17
-        { name: 'Vikings',     rating:  -1.5 },  // DVOA #18
-        { name: 'Falcons',     rating:  -2.0 },  // DVOA #19
-        { name: 'Buccaneers',  rating:  -2.5 },  // DVOA #20
-        { name: 'Bengals',     rating:  -3.0 },  // DVOA #21
-        { name: 'Cowboys',     rating:  -3.5 },  // DVOA #22
-        { name: 'Commanders',  rating:  -4.0 },  // DVOA #23
-        { name: 'Dolphins',    rating:  -4.5 },  // DVOA #24
-        { name: 'Panthers',    rating:  -5.0 },  // DVOA #25
-        { name: 'Giants',      rating:  -5.5 },  // DVOA #26
-        { name: 'Cardinals',   rating:  -6.0 },  // DVOA #27
-        { name: 'Saints',      rating:  -6.5 },  // DVOA #28
-        { name: 'Titans',      rating:  -7.0 },  // DVOA #29
-        { name: 'Raiders',     rating:  -8.0 },  // DVOA #30
-        { name: 'Browns',      rating:  -9.0 },  // DVOA #31
-        { name: 'Jets',        rating: -10.0 }   // DVOA #32
+        { name: 'Seahawks',    rating:  10.5 },
+        { name: 'Rams',        rating:   9.5 },
+        { name: 'Lions',       rating:   7.0 },
+        { name: 'Texans',      rating:   5.5 },
+        { name: 'Colts',       rating:   5.0 },
+        { name: 'Jaguars',     rating:   4.5 },
+        { name: 'Broncos',     rating:   4.0 },
+        { name: 'Bills',       rating:   3.5 },
+        { name: 'Patriots',    rating:   3.0 },
+        { name: '49ers',       rating:   2.5 },
+        { name: 'Packers',     rating:   2.0 },
+        { name: 'Steelers',    rating:   1.5 },
+        { name: 'Eagles',      rating:   1.0 },
+        { name: 'Ravens',      rating:   0.5 },
+        { name: 'Chiefs',      rating:   0.0 },
+        { name: 'Bears',       rating:  -0.5 },
+        { name: 'Chargers',    rating:  -1.0 },
+        { name: 'Vikings',     rating:  -1.5 },
+        { name: 'Falcons',     rating:  -2.0 },
+        { name: 'Buccaneers',  rating:  -2.5 },
+        { name: 'Bengals',     rating:  -3.0 },
+        { name: 'Cowboys',     rating:  -3.5 },
+        { name: 'Commanders',  rating:  -4.0 },
+        { name: 'Dolphins',    rating:  -4.5 },
+        { name: 'Panthers',    rating:  -5.0 },
+        { name: 'Giants',      rating:  -5.5 },
+        { name: 'Cardinals',   rating:  -6.0 },
+        { name: 'Saints',      rating:  -6.5 },
+        { name: 'Titans',      rating:  -7.0 },
+        { name: 'Raiders',     rating:  -8.0 },
+        { name: 'Browns',      rating:  -9.0 },
+        { name: 'Jets',        rating: -10.0 }
     ];
 
     var HFA = 2.5; // home field advantage in points
@@ -184,11 +184,13 @@
         awayTeam: null,
         homeTeam: null,
         spread: 0,
+        wager: 100,
         locked: false
     };
 
     var bankrollEl = document.getElementById('gameBankroll');
     var recordEl = document.getElementById('gameRecord');
+    var matchupHeaderEl = document.getElementById('matchupHeader');
     var awayNameEl = document.getElementById('awayName');
     var homeNameEl = document.getElementById('homeName');
     var awaySpreadEl = document.getElementById('awaySpread');
@@ -197,6 +199,8 @@
     var homeBtn = document.getElementById('homeTeam');
     var resultEl = document.getElementById('gameResult');
     var newBtn = document.getElementById('gameNewBtn');
+    var wagerInput = document.getElementById('wagerInput');
+    var wagerPresets = document.querySelectorAll('.wager-preset');
 
     function pickTwo() {
         var shuffled = nflTeams.slice();
@@ -210,11 +214,14 @@
     }
 
     function calculateSpread(home, away) {
-        // Spread from home perspective: positive = home favored
-        var rawSpread = home.rating - away.rating + HFA;
-        // Add slight market noise (±1.5 pts)
-        var noise = (Math.random() - 0.5) * 3;
-        return Math.round((rawSpread + noise) * 2) / 2; // nearest 0.5
+        // True median spread from DVOA + home field advantage
+        var trueSpread = home.rating - away.rating + HFA;
+        // Bias: the posted line can be off by up to ±4 points
+        // This creates mispriced lines the user should identify
+        var bias = (Math.random() - 0.5) * 8;
+        // Small additional market noise ±0.5
+        var noise = (Math.random() - 0.5) * 1;
+        return Math.round((trueSpread + bias + noise) * 2) / 2; // nearest 0.5
     }
 
     function formatSpread(val) {
@@ -224,26 +231,43 @@
     }
 
     function simulateGame(home, away) {
-        // Expected margin based on true team skill + home field
+        // True expected margin based on DVOA skill + home field
         var expectedMargin = home.rating - away.rating + HFA;
-        // Normal-ish noise (~13 pt std dev, realistic NFL variance)
-        var noise = 0;
-        for (var i = 0; i < 12; i++) {
-            noise += Math.random();
-        }
-        noise = (noise - 6) * 5.3; // ~13 pt std dev
+        // Box-Muller for proper normal distribution (~13 pt std dev)
+        var u1 = Math.random();
+        var u2 = Math.random();
+        var z = Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2);
+        var noise = z * 13.5;
         return Math.round(expectedMargin + noise);
     }
 
     function generateScores(margin) {
-        // Generate realistic-ish NFL scores
-        var base = Math.floor(Math.random() * 14) + 14; // loser scores 14-27
+        // Generate realistic NFL scores
+        var base = Math.floor(Math.random() * 14) + 14;
         var winner = base + Math.abs(margin);
         if (margin >= 0) {
             return { home: winner, away: base };
         } else {
             return { home: base, away: winner };
         }
+    }
+
+    function getWager() {
+        var val = parseInt(wagerInput.value, 10);
+        if (isNaN(val) || val < 1) return 1;
+        return Math.min(val, gameState.bankroll);
+    }
+
+    function updateWagerPresets() {
+        var current = parseInt(wagerInput.value, 10);
+        wagerPresets.forEach(function (btn) {
+            var amt = parseInt(btn.getAttribute('data-amount'), 10);
+            if (amt === current) {
+                btn.classList.add('active');
+            } else {
+                btn.classList.remove('active');
+            }
+        });
     }
 
     function newMatchup() {
@@ -253,9 +277,11 @@
         gameState.homeTeam = teams[1];
         gameState.spread = calculateSpread(gameState.homeTeam, gameState.awayTeam);
 
+        // Away @ Home header
+        matchupHeaderEl.textContent = gameState.awayTeam.name + ' @ ' + gameState.homeTeam.name;
         awayNameEl.textContent = gameState.awayTeam.name;
         homeNameEl.textContent = gameState.homeTeam.name;
-        // Spread display: home gets inverse, away gets spread value
+        // Spread display: negative = favored
         homeSpreadEl.textContent = formatSpread(-gameState.spread);
         awaySpreadEl.textContent = formatSpread(gameState.spread);
 
@@ -264,11 +290,19 @@
         awayBtn.disabled = false;
         homeBtn.disabled = false;
         resultEl.innerHTML = '';
+
+        // Cap wager input to current bankroll
+        if (parseInt(wagerInput.value, 10) > gameState.bankroll) {
+            wagerInput.value = gameState.bankroll;
+        }
+        updateWagerPresets();
     }
 
     function placeBet(side) {
         if (gameState.locked) return;
-        if (gameState.bankroll < 100) return;
+        var wager = getWager();
+        if (wager > gameState.bankroll || gameState.bankroll <= 0) return;
+        gameState.wager = wager;
         gameState.locked = true;
 
         awayBtn.disabled = true;
@@ -280,13 +314,12 @@
             homeBtn.classList.add('selected');
         }
 
-        // Simulate after a short delay for suspense
         setTimeout(function () {
             var margin = simulateGame(gameState.homeTeam, gameState.awayTeam);
             var scores = generateScores(margin);
 
-            // Determine ATS result
-            var coverMargin = margin - gameState.spread; // positive = home covers
+            // ATS result: positive coverMargin = home covers
+            var coverMargin = margin - gameState.spread;
 
             var userWon;
             var isPush = false;
@@ -304,19 +337,18 @@
             if (isPush) {
                 gameState.pushes++;
             } else if (userWon) {
-                gameState.bankroll += 100;
+                gameState.bankroll += gameState.wager;
                 gameState.wins++;
             } else {
-                gameState.bankroll -= 100;
+                gameState.bankroll -= gameState.wager;
                 gameState.losses++;
             }
 
-            // Update display
             bankrollEl.textContent = '$' + gameState.bankroll.toLocaleString();
             bankrollEl.className = 'game-bankroll-value' + (gameState.bankroll < 1000 ? ' negative' : '');
             recordEl.textContent = gameState.wins + '-' + gameState.losses + (gameState.pushes > 0 ? '-' + gameState.pushes : '');
 
-            // Show winner/loser styling (based on who covered the spread)
+            // Color code by who covered
             if (coverMargin > 0) {
                 homeBtn.classList.add('winner');
                 awayBtn.classList.add('loser');
@@ -325,14 +357,13 @@
                 homeBtn.classList.add('loser');
             }
 
-            // Show result
+            var wagerStr = '$' + gameState.wager.toLocaleString();
             var outcomeClass = isPush ? 'push' : (userWon ? 'win' : 'loss');
-            var outcomeText = isPush ? 'PUSH — $100 returned' : (userWon ? 'WIN +$100' : 'LOSS -$100');
+            var outcomeText = isPush ? 'PUSH — ' + wagerStr + ' returned' : (userWon ? 'WIN +' + wagerStr : 'LOSS -' + wagerStr);
             resultEl.innerHTML =
-                '<span class="game-result-score">' + gameState.awayTeam.name + ' ' + scores.away + ' — ' + scores.home + ' ' + gameState.homeTeam.name + '</span>' +
+                '<span class="game-result-score">' + gameState.awayTeam.name + ' ' + scores.away + '  —  ' + scores.home + ' ' + gameState.homeTeam.name + '</span>' +
                 '<span class="game-result-outcome ' + outcomeClass + '">' + outcomeText + '</span>';
 
-            // If bankroll is 0
             if (gameState.bankroll <= 0) {
                 setTimeout(function () {
                     resultEl.innerHTML += '<span style="color: var(--text-muted); font-size: 0.8rem; margin-top: 8px;">Bankroll busted! Click "New Matchup" to reset.</span>';
@@ -345,6 +376,16 @@
         awayBtn.addEventListener('click', function () { placeBet('away'); });
         homeBtn.addEventListener('click', function () { placeBet('home'); });
 
+        // Wager presets
+        wagerPresets.forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                wagerInput.value = btn.getAttribute('data-amount');
+                updateWagerPresets();
+            });
+        });
+
+        wagerInput.addEventListener('input', updateWagerPresets);
+
         newBtn.addEventListener('click', function () {
             if (gameState.bankroll <= 0) {
                 gameState.bankroll = 1000;
@@ -354,11 +395,11 @@
                 bankrollEl.textContent = '$1,000';
                 bankrollEl.className = 'game-bankroll-value';
                 recordEl.textContent = '0-0';
+                wagerInput.value = 100;
             }
             newMatchup();
         });
 
-        // Initialize first matchup
         newMatchup();
     }
 
