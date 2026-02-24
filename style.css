@@ -820,6 +820,22 @@ section {
     background: linear-gradient(180deg, var(--bg) 0%, #0a0d0c 50%, var(--bg) 100%);
 }
 
+.game-source {
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 0.75rem;
+    margin-bottom: 1.5rem;
+}
+
+.game-source a {
+    color: var(--accent);
+    text-decoration: none;
+}
+
+.game-source a:hover {
+    text-decoration: underline;
+}
+
 .game-wrapper {
     display: flex;
     flex-direction: column;

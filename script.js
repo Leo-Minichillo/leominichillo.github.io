@@ -146,6 +146,44 @@
         'Titans', 'Commanders'
     ];
 
+    // 2025-26 NFL team data: nfelo ratings + EPA per play (offense & defense)
+    // Spread model blends Elo margin (60%) with EPA matchup margin (40%) + home-field advantage
+    // Score simulation uses bivariate normal around EPA-derived team means
+    var teamData = {
+        'Seahawks':    { nfelo: 1731.02, offEPA:  0.0895, defEPA: -0.1428 },
+        'Rams':        { nfelo: 1660.29, offEPA:  0.1344, defEPA: -0.0305 },
+        'Bills':       { nfelo: 1634.73, offEPA:  0.1487, defEPA:  0.0388 },
+        'Patriots':    { nfelo: 1621.17, offEPA:  0.0901, defEPA: -0.094  },
+        '49ers':       { nfelo: 1609.42, offEPA:  0.0872, defEPA:  0.0462 },
+        'Texans':      { nfelo: 1603.33, offEPA: -0.0226, defEPA: -0.1693 },
+        'Lions':       { nfelo: 1602.05, offEPA:  0.0902, defEPA:  0.0203 },
+        'Jaguars':     { nfelo: 1599.65, offEPA:  0.073,  defEPA: -0.0636 },
+        'Eagles':      { nfelo: 1572.2,  offEPA:  0.0133, defEPA: -0.0403 },
+        'Bears':       { nfelo: 1566.14, offEPA:  0.0689, defEPA:  0.0422 },
+        'Ravens':      { nfelo: 1557.3,  offEPA:  0.0596, defEPA:  0.0342 },
+        'Broncos':     { nfelo: 1534.56, offEPA:  0.0221, defEPA: -0.0507 },
+        'Bengals':     { nfelo: 1508.87, offEPA:  0.0428, defEPA:  0.1282 },
+        'Steelers':    { nfelo: 1503.93, offEPA:  0.0203, defEPA:  0.0327 },
+        'Packers':     { nfelo: 1492.8,  offEPA:  0.119,  defEPA:  0.0786 },
+        'Falcons':     { nfelo: 1489.71, offEPA: -0.0223, defEPA:  0.0305 },
+        'Cowboys':     { nfelo: 1485.49, offEPA:  0.1319, defEPA:  0.1845 },
+        'Vikings':     { nfelo: 1478.4,  offEPA: -0.0945, defEPA: -0.0977 },
+        'Chargers':    { nfelo: 1456.61, offEPA: -0.0301, defEPA: -0.0488 },
+        'Buccaneers':  { nfelo: 1438.76, offEPA: -0.0025, defEPA:  0.027  },
+        'Giants':      { nfelo: 1428.52, offEPA:  0.0346, defEPA:  0.0914 },
+        'Chiefs':      { nfelo: 1428.39, offEPA:  0.0498, defEPA:  0.0157 },
+        'Saints':      { nfelo: 1418.04, offEPA: -0.1245, defEPA: -0.035  },
+        'Panthers':    { nfelo: 1400.67, offEPA: -0.017,  defEPA:  0.0664 },
+        'Colts':       { nfelo: 1392.11, offEPA:  0.1117, defEPA:  0.0405 },
+        'Browns':      { nfelo: 1386.42, offEPA: -0.2101, defEPA: -0.0959 },
+        'Dolphins':    { nfelo: 1356.64, offEPA:  0.0094, defEPA:  0.0902 },
+        'Cardinals':   { nfelo: 1335.27, offEPA: -0.0274, defEPA:  0.1169 },
+        'Titans':      { nfelo: 1334.42, offEPA: -0.1422, defEPA:  0.0865 },
+        'Commanders':  { nfelo: 1318.4,  offEPA:  0.0323, defEPA:  0.1383 },
+        'Raiders':     { nfelo: 1285.34, offEPA: -0.2042, defEPA:  0.0318 },
+        'Jets':        { nfelo: 1226.52, offEPA: -0.0706, defEPA:  0.1569 }
+    };
+
     var gameState = {
         bankroll: 1000,
         wins: 0,
@@ -154,6 +192,8 @@
         awayTeam: '',
         homeTeam: '',
         spread: 0,
+        muHome: 22,
+        muAway: 22,
         locked: false
     };
 
@@ -179,39 +219,65 @@
         return [shuffled[0], shuffled[1]];
     }
 
-    function generateSpread() {
-        // Spreads from 1 to 14 in 0.5 increments
-        var raw = Math.floor(Math.random() * 27) + 2; // 2-28
-        return raw / 2; // 1.0 to 14.0
+    function calculateSpread(homeTeam, awayTeam) {
+        var home = teamData[homeTeam];
+        var away = teamData[awayTeam];
+        if (!home || !away) return { spread: 0, muHome: 22, muAway: 22 };
+
+        // Model constants
+        var basePts = 22.0;
+        var plays = 62;
+        var alpha = 0.35;
+        var eloPerPoint = 26;
+        var wElo = 0.60;
+        var wEpa = 0.40;
+        var hfa = 1.7;
+
+        // EPA matchup points (home offense vs away defense, and vice versa)
+        var epaMatchupHome = home.offEPA + away.defEPA;
+        var epaMatchupAway = away.offEPA + home.defEPA;
+        var muHomeEpa = basePts + alpha * plays * epaMatchupHome;
+        var muAwayEpa = basePts + alpha * plays * epaMatchupAway;
+
+        // Blended spread: 60% Elo + 40% EPA + home-field advantage
+        var marginEpa = muHomeEpa - muAwayEpa;
+        var marginElo = (home.nfelo - away.nfelo) / eloPerPoint;
+        var spread = wEpa * marginEpa + wElo * marginElo + hfa;
+
+        // Final team means (keep EPA total, inject blended spread)
+        var total = muHomeEpa + muAwayEpa;
+        var muHome = (total + spread) / 2;
+        var muAway = (total - spread) / 2;
+
+        // Round spread to nearest 0.5
+        spread = Math.round(spread * 2) / 2;
+
+        return { spread: spread, muHome: muHome, muAway: muAway };
     }
 
     function formatSpread(val) {
         return val > 0 ? '+' + val.toFixed(1) : val.toFixed(1);
     }
 
-    function simulateGame(spread) {
-        // Home team is favored by -spread
-        // Generate a margin relative to the spread with some noise
-        // margin > 0 means home won by that many points
-        var homeEdge = spread; // positive spread means home is favored
-        var noise = 0;
-        for (var i = 0; i < 6; i++) {
-            noise += Math.random();
-        }
-        noise = (noise - 3) * 8; // normal-ish, std dev ~8 points
-        var margin = homeEdge + noise;
-        return Math.round(margin);
+    function boxMuller() {
+        var u1, u2;
+        do { u1 = Math.random(); } while (u1 === 0);
+        u2 = Math.random();
+        var z0 = Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2);
+        var z1 = Math.sqrt(-2 * Math.log(u1)) * Math.sin(2 * Math.PI * u2);
+        return [z0, z1];
     }
 
-    function generateScores(margin) {
-        // Generate realistic-ish NFL scores
-        var base = Math.floor(Math.random() * 14) + 14; // loser scores 14-27
-        var winner = base + Math.abs(margin);
-        if (margin >= 0) {
-            return { home: winner, away: base };
-        } else {
-            return { home: base, away: winner };
-        }
+    function simulateScores(muHome, muAway) {
+        var sd = 10.5;
+        var rho = 0.10;
+        var z = boxMuller();
+        var scoreHome = muHome + sd * z[0];
+        var scoreAway = muAway + sd * (rho * z[0] + Math.sqrt(1 - rho * rho) * z[1]);
+        return {
+            home: Math.max(0, Math.round(scoreHome)),
+            away: Math.max(0, Math.round(scoreAway))
+        };
     }
 
     function newMatchup() {
@@ -219,11 +285,14 @@
         var teams = pickTwo();
         gameState.awayTeam = teams[0];
         gameState.homeTeam = teams[1];
-        gameState.spread = generateSpread();
+        var result = calculateSpread(gameState.homeTeam, gameState.awayTeam);
+        gameState.spread = result.spread;
+        gameState.muHome = result.muHome;
+        gameState.muAway = result.muAway;
 
         awayNameEl.textContent = gameState.awayTeam;
         homeNameEl.textContent = gameState.homeTeam;
-        // Home team is favored (negative spread)
+        // spread > 0: home favored; spread < 0: away favored
         homeSpreadEl.textContent = formatSpread(-gameState.spread);
         awaySpreadEl.textContent = formatSpread(gameState.spread);
 
@@ -250,8 +319,8 @@
 
         // Simulate after a short delay for suspense
         setTimeout(function () {
-            var margin = simulateGame(gameState.spread);
-            var scores = generateScores(margin);
+            var scores = simulateScores(gameState.muHome, gameState.muAway);
+            var margin = scores.home - scores.away;
 
             // Determine ATS result
             // If you picked home (spread is -X), home needs to win by more than spread
