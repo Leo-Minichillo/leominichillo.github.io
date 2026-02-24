@@ -146,6 +146,45 @@
         'Titans', 'Commanders'
     ];
 
+    // 2025-26 NFL power ratings derived from final DVOA rankings (FTN Fantasy)
+    // Values are points above/below league average on a neutral field.
+    // Spread formula: home_rating - away_rating + home_field_advantage (2.5 pts)
+    // Source: ftnfantasy.com/nfl/final-2025-dvoa-ratings
+    var teamRatings = {
+        'Seahawks':   7.75,  // DVOA #1  — historically elite (7th best DVOA ever)
+        'Rams':       7.25,  // DVOA #2  — historically elite (8th best DVOA ever)
+        'Lions':      6.75,  // DVOA #3
+        'Texans':     6.25,  // DVOA #4
+        'Colts':      5.75,  // DVOA #5
+        'Jaguars':    5.25,  // DVOA #6
+        'Broncos':    4.75,  // DVOA #7
+        'Bills':      4.25,  // DVOA #8
+        'Patriots':   3.75,  // DVOA #9
+        '49ers':      3.25,  // DVOA #10
+        'Packers':    2.75,  // DVOA #11
+        'Steelers':   2.25,  // DVOA #12
+        'Eagles':     1.75,  // DVOA #13
+        'Ravens':     1.25,  // DVOA #14
+        'Chiefs':     0.75,  // DVOA #15
+        'Bears':      0.25,  // DVOA #16
+        'Chargers':  -0.25,  // DVOA #17
+        'Vikings':   -0.75,  // DVOA #18
+        'Falcons':   -1.25,  // DVOA #19
+        'Buccaneers':-1.75,  // DVOA #20
+        'Bengals':   -2.25,  // DVOA #21
+        'Cowboys':   -2.75,  // DVOA #22 — 4th-worst defense in DVOA history
+        'Commanders':-3.25,  // DVOA #23
+        'Dolphins':  -3.75,  // DVOA #24
+        'Panthers':  -4.25,  // DVOA #25
+        'Giants':    -4.75,  // DVOA #26
+        'Cardinals': -5.25,  // DVOA #27
+        'Saints':    -5.75,  // DVOA #28
+        'Titans':    -6.25,  // DVOA #29
+        'Raiders':   -6.75,  // DVOA #30 — historically bad run offense
+        'Browns':    -7.25,  // DVOA #31
+        'Jets':      -7.75   // DVOA #32 — 2nd-worst pass defense in DVOA history
+    };
+
     var gameState = {
         bankroll: 1000,
         wins: 0,
@@ -179,10 +218,13 @@
         return [shuffled[0], shuffled[1]];
     }
 
-    function generateSpread() {
-        // Spreads from 1 to 14 in 0.5 increments
-        var raw = Math.floor(Math.random() * 27) + 2; // 2-28
-        return raw / 2; // 1.0 to 14.0
+    function calculateSpread(homeTeam, awayTeam) {
+        var homeRating = teamRatings[homeTeam] !== undefined ? teamRatings[homeTeam] : 0;
+        var awayRating = teamRatings[awayTeam] !== undefined ? teamRatings[awayTeam] : 0;
+        var homeFieldAdv = 2.5;
+        var rawSpread = (homeRating - awayRating) + homeFieldAdv;
+        // Round to nearest 0.5
+        return Math.round(rawSpread * 2) / 2;
     }
 
     function formatSpread(val) {
@@ -219,11 +261,11 @@
         var teams = pickTwo();
         gameState.awayTeam = teams[0];
         gameState.homeTeam = teams[1];
-        gameState.spread = generateSpread();
+        gameState.spread = calculateSpread(gameState.homeTeam, gameState.awayTeam);
 
         awayNameEl.textContent = gameState.awayTeam;
         homeNameEl.textContent = gameState.homeTeam;
-        // Home team is favored (negative spread)
+        // spread > 0: home favored; spread < 0: away favored
         homeSpreadEl.textContent = formatSpread(-gameState.spread);
         awaySpreadEl.textContent = formatSpread(gameState.spread);
 
