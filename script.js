@@ -197,6 +197,22 @@
         locked: false
     };
 
+    // Bet history for PnL chart: [{actualPnl, expectedPnl}]
+    var betHistory = [{ actualPnl: 0, expectedPnl: 0 }];
+
+    // Standard deviation of the game margin (for win probability)
+    // sigma = sqrt(2 * sd^2 * (1 - rho)) where sd=10.5, rho=0.10
+    var sigmaMargin = Math.sqrt(2 * 10.5 * 10.5 * 0.9); // ~14.09
+
+    function normalCDF(x) {
+        if (x < -8) return 0;
+        if (x > 8) return 1;
+        var t = 1 / (1 + 0.2316419 * Math.abs(x));
+        var d = 0.3989422804014327;
+        var p = d * Math.exp(-x * x / 2) * t * (0.319381530 + t * (-0.356563782 + t * (1.781477937 + t * (-1.821255978 + t * 1.330274429))));
+        return x > 0 ? 1 - p : p;
+    }
+
     var bankrollEl = document.getElementById('gameBankroll');
     var recordEl = document.getElementById('gameRecord');
     var awayNameEl = document.getElementById('awayName');
@@ -280,6 +296,118 @@
         };
     }
 
+    function drawChart() {
+        var canvas = document.getElementById('pnlChart');
+        if (!canvas) return;
+        var ctx = canvas.getContext('2d');
+        var dpr = window.devicePixelRatio || 1;
+        var rect = canvas.getBoundingClientRect();
+        canvas.width = rect.width * dpr;
+        canvas.height = rect.height * dpr;
+        ctx.scale(dpr, dpr);
+        var w = rect.width;
+        var h = rect.height;
+
+        var pad = { top: 16, right: 16, bottom: 24, left: 48 };
+        var plotW = w - pad.left - pad.right;
+        var plotH = h - pad.top - pad.bottom;
+
+        ctx.clearRect(0, 0, w, h);
+
+        var n = betHistory.length;
+        if (n < 2) {
+            ctx.fillStyle = 'rgba(255,255,255,0.15)';
+            ctx.font = '12px monospace';
+            ctx.textAlign = 'center';
+            ctx.fillText('Place a bet to start tracking P&L', w / 2, h / 2);
+            return;
+        }
+
+        // Find y range
+        var yMin = 0, yMax = 0;
+        for (var i = 0; i < n; i++) {
+            yMin = Math.min(yMin, betHistory[i].actualPnl, betHistory[i].expectedPnl);
+            yMax = Math.max(yMax, betHistory[i].actualPnl, betHistory[i].expectedPnl);
+        }
+        var yPad = Math.max(50, (yMax - yMin) * 0.15);
+        yMin -= yPad;
+        yMax += yPad;
+
+        function xScale(idx) { return pad.left + (idx / (n - 1)) * plotW; }
+        function yScale(v) { return pad.top + plotH - ((v - yMin) / (yMax - yMin)) * plotH; }
+
+        // Gridlines
+        var step = niceStep(yMax - yMin, 4);
+        var gridStart = Math.ceil(yMin / step) * step;
+        ctx.font = '10px monospace';
+        ctx.textAlign = 'right';
+        for (var g = gridStart; g <= yMax; g += step) {
+            var gy = yScale(g);
+            ctx.beginPath();
+            ctx.moveTo(pad.left, gy);
+            ctx.lineTo(pad.left + plotW, gy);
+            if (g === 0) {
+                ctx.strokeStyle = 'rgba(255,255,255,0.2)';
+                ctx.lineWidth = 1;
+            } else {
+                ctx.strokeStyle = 'rgba(255,255,255,0.06)';
+                ctx.lineWidth = 1;
+            }
+            ctx.stroke();
+            ctx.fillStyle = 'rgba(255,255,255,0.3)';
+            ctx.fillText('$' + g, pad.left - 6, gy + 3);
+        }
+
+        // Expected PnL line (yellow dashed)
+        ctx.beginPath();
+        ctx.strokeStyle = 'rgba(251, 191, 36, 0.6)';
+        ctx.lineWidth = 1.5;
+        ctx.setLineDash([4, 4]);
+        for (var i = 0; i < n; i++) {
+            if (i === 0) ctx.moveTo(xScale(i), yScale(betHistory[i].expectedPnl));
+            else ctx.lineTo(xScale(i), yScale(betHistory[i].expectedPnl));
+        }
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        // Actual PnL line (green solid)
+        ctx.beginPath();
+        ctx.strokeStyle = '#10b981';
+        ctx.lineWidth = 2;
+        for (var i = 0; i < n; i++) {
+            if (i === 0) ctx.moveTo(xScale(i), yScale(betHistory[i].actualPnl));
+            else ctx.lineTo(xScale(i), yScale(betHistory[i].actualPnl));
+        }
+        ctx.stroke();
+
+        // Dots on latest point
+        var last = n - 1;
+        ctx.beginPath();
+        ctx.arc(xScale(last), yScale(betHistory[last].actualPnl), 4, 0, 2 * Math.PI);
+        ctx.fillStyle = '#10b981';
+        ctx.fill();
+        ctx.beginPath();
+        ctx.arc(xScale(last), yScale(betHistory[last].expectedPnl), 3, 0, 2 * Math.PI);
+        ctx.fillStyle = 'rgba(251, 191, 36, 0.8)';
+        ctx.fill();
+
+        // X axis label
+        ctx.fillStyle = 'rgba(255,255,255,0.25)';
+        ctx.textAlign = 'center';
+        ctx.font = '10px monospace';
+        ctx.fillText('Bet #' + (n - 1), pad.left + plotW / 2, h - 4);
+    }
+
+    function niceStep(range, targetSteps) {
+        var rough = range / targetSteps;
+        var mag = Math.pow(10, Math.floor(Math.log10(rough)));
+        var norm = rough / mag;
+        if (norm < 1.5) return mag;
+        if (norm < 3) return 2 * mag;
+        if (norm < 7) return 5 * mag;
+        return 10 * mag;
+    }
+
     function newMatchup() {
         gameState.locked = false;
         var teams = pickTwo();
@@ -356,6 +484,21 @@
             bankrollEl.className = 'game-bankroll-value' + (gameState.bankroll < 1000 ? ' negative' : '');
             recordEl.textContent = gameState.wins + '-' + gameState.losses + (gameState.pushes > 0 ? '-' + gameState.pushes : '');
 
+            // Track PnL for chart
+            var trueSpread = gameState.muHome - gameState.muAway;
+            var z = (gameState.spread - trueSpread) / sigmaMargin;
+            var pHomeCover = 1 - normalCDF(z);
+            var ev = (side === 'home')
+                ? 100 * (2 * pHomeCover - 1)
+                : -100 * (2 * pHomeCover - 1);
+            var prev = betHistory[betHistory.length - 1];
+            var actualDelta = isPush ? 0 : (userWon ? 100 : -100);
+            betHistory.push({
+                actualPnl: prev.actualPnl + actualDelta,
+                expectedPnl: prev.expectedPnl + ev
+            });
+            drawChart();
+
             // Show winner/loser styling
             if (margin > 0) {
                 homeBtn.classList.add('winner');
@@ -394,12 +537,15 @@
                 bankrollEl.textContent = '$1,000';
                 bankrollEl.className = 'game-bankroll-value';
                 recordEl.textContent = '0-0';
+                betHistory = [{ actualPnl: 0, expectedPnl: 0 }];
+                drawChart();
             }
             newMatchup();
         });
 
         // Initialize first matchup
         newMatchup();
+        drawChart();
     }
 
 })();
