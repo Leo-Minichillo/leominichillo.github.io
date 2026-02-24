@@ -50,7 +50,7 @@
             <p class="hero-subtitle">Trader at Fanatics Betting &amp; Gaming. Turning data into edge.</p>
             <div class="hero-stats">
                 <div class="stat">
-                    <span class="stat-value" data-target="40">$0k</span>
+                    <span class="stat-value" data-target="31">$0k</span>
                     <span class="stat-label">Sports Betting P&L</span>
                 </div>
                 <div class="stat">
@@ -67,8 +67,23 @@
                 <a href="https://polymarket.com/profile/0xc42e3Ad86BD9233631b5d494D29eA8aCaa25EdBd" class="btn btn-outline" target="_blank" rel="noopener">Polymarket &nearr;</a>
             </div>
         </div>
-        <div class="scroll-indicator">
-            <div class="scroll-line"></div>
+        <div class="trend-line-wrapper">
+            <svg class="trend-line" viewBox="0 0 1000 400" preserveAspectRatio="none" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <linearGradient id="lineGrad" x1="0" y1="0" x2="1" y2="0">
+                        <stop offset="0%" stop-color="#10b981" stop-opacity="0"/>
+                        <stop offset="15%" stop-color="#10b981" stop-opacity="0.5"/>
+                        <stop offset="100%" stop-color="#10b981"/>
+                    </linearGradient>
+                    <linearGradient id="fillGrad" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stop-color="#10b981" stop-opacity="0.12"/>
+                        <stop offset="100%" stop-color="#10b981" stop-opacity="0"/>
+                    </linearGradient>
+                </defs>
+                <path class="trend-line-fill" d="M 0 380 C 50 375, 80 370, 120 360 C 160 348, 200 355, 250 340 C 300 322, 330 330, 380 305 C 430 280, 460 290, 520 260 C 580 230, 600 240, 660 200 C 720 160, 750 170, 800 130 C 850 90, 880 100, 920 60 C 950 35, 975 20, 1000 15 L 1000 400 L 0 400 Z" fill="url(#fillGrad)" />
+                <path class="trend-line-path" d="M 0 380 C 50 375, 80 370, 120 360 C 160 348, 200 355, 250 340 C 300 322, 330 330, 380 305 C 430 280, 460 290, 520 260 C 580 230, 600 240, 660 200 C 720 160, 750 170, 800 130 C 850 90, 880 100, 920 60 C 950 35, 975 20, 1000 15" stroke="url(#lineGrad)" stroke-width="3" stroke-linecap="round" fill="none" />
+                <circle class="trend-line-dot" cx="1000" cy="15" r="5" fill="#10b981" />
+            </svg>
         </div>
     </section>
 
@@ -81,7 +96,10 @@
             </div>
             <div class="about-grid">
                 <div class="about-text">
-                    <p class="about-lead">I'm Leo &mdash; a data-driven sports trader who found his edge through an unconventional path.</p>
+                    <div class="about-intro">
+                        <img src="leo.jpg" alt="Leo Minichillo" class="about-photo">
+                        <p class="about-lead">I'm Leo &mdash; a data-driven sports trader who loves chasing edges and finding exploits.</p>
+                    </div>
                     <div class="timeline">
                         <div class="timeline-item">
                             <div class="timeline-marker"></div>
@@ -130,7 +148,6 @@
                         <span class="tag">Quantitative Trading</span>
                         <span class="tag">Market Making</span>
                         <span class="tag">Expected Value</span>
-                        <span class="tag">Python</span>
                         <span class="tag">SQL</span>
                     </div>
                 </div>
@@ -155,7 +172,7 @@
                             <p class="career-company">Fanatics Betting &amp; Gaming</p>
                         </div>
                     </div>
-                    <p class="career-description">Trading across general sports markets. Leveraging data science and quantitative analysis to manage risk and find value in sports betting markets.</p>
+                    <p class="career-description">Market operations supporting the pricing, integrity, and availability of sportsbook markets across professional and collegiate sports. Monitoring live and pre-match markets, reviewing line movements, conducting customer bet reviews, and building SQL-based reporting workflows to track performance and surface pricing anomalies.</p>
                 </div>
             </div>
             <div class="career-education">
@@ -179,54 +196,79 @@
             </div>
             <div class="results-overview">
                 <div class="results-total">
-                    <span class="results-total-label">Total Sports Betting P&L</span>
-                    <span class="results-total-value">~$40,000</span>
+                    <span class="results-total-label">Total Sports Betting P&L <span style="font-weight: 400; opacity: 0.6;">(as of Feb 2026)</span></span>
+                    <span class="results-total-value">~$31,500</span>
                 </div>
             </div>
             <div class="results-grid">
                 <div class="result-card positive">
                     <div class="result-book">Bet365</div>
-                    <div class="result-amount">+$11,900</div>
+                    <div class="result-amount">+$11,910.60</div>
                     <div class="result-bar"><div class="result-bar-fill" style="--fill-width: 100%"></div></div>
                 </div>
                 <div class="result-card positive">
                     <div class="result-book">FanDuel</div>
-                    <div class="result-amount">+$6,000</div>
-                    <div class="result-bar"><div class="result-bar-fill" style="--fill-width: 50%"></div></div>
+                    <div class="result-amount">+$7,023.14</div>
+                    <div class="result-bar"><div class="result-bar-fill" style="--fill-width: 59%"></div></div>
                 </div>
                 <div class="result-card positive">
                     <div class="result-book">BetOpenly</div>
-                    <div class="result-amount">+$5,000</div>
-                    <div class="result-bar"><div class="result-bar-fill" style="--fill-width: 42%"></div></div>
+                    <div class="result-amount">+$5,834</div>
+                    <div class="result-bar"><div class="result-bar-fill" style="--fill-width: 49%"></div></div>
                 </div>
                 <div class="result-card positive">
                     <div class="result-book">BetUS</div>
-                    <div class="result-amount">+$5,000</div>
-                    <div class="result-bar"><div class="result-bar-fill" style="--fill-width: 42%"></div></div>
+                    <div class="result-amount">+$5,067</div>
+                    <div class="result-bar"><div class="result-bar-fill" style="--fill-width: 43%"></div></div>
                 </div>
                 <div class="result-card positive">
                     <div class="result-book">Bet Rivers</div>
-                    <div class="result-amount">+$2,100</div>
+                    <div class="result-amount">+$2,106.39</div>
                     <div class="result-bar"><div class="result-bar-fill" style="--fill-width: 18%"></div></div>
                 </div>
                 <div class="result-card positive">
+                    <div class="result-book">ProphetX</div>
+                    <div class="result-amount">+$1,355</div>
+                    <div class="result-bar"><div class="result-bar-fill" style="--fill-width: 11%"></div></div>
+                </div>
+                <div class="result-card positive">
                     <div class="result-book">MyBookie</div>
-                    <div class="result-amount">+$1,300</div>
+                    <div class="result-amount">+$1,333</div>
                     <div class="result-bar"><div class="result-bar-fill" style="--fill-width: 11%"></div></div>
                 </div>
                 <div class="result-card positive">
                     <div class="result-book">DraftKings</div>
-                    <div class="result-amount">+$1,000</div>
-                    <div class="result-bar"><div class="result-bar-fill" style="--fill-width: 8%"></div></div>
+                    <div class="result-amount">+$1,018.56</div>
+                    <div class="result-bar"><div class="result-bar-fill" style="--fill-width: 9%"></div></div>
                 </div>
                 <div class="result-card positive">
                     <div class="result-book">Thrillz</div>
                     <div class="result-amount">+$1,000</div>
                     <div class="result-bar"><div class="result-bar-fill" style="--fill-width: 8%"></div></div>
                 </div>
+                <div class="result-card positive">
+                    <div class="result-book">Caesers</div>
+                    <div class="result-amount">+$293.32</div>
+                    <div class="result-bar"><div class="result-bar-fill" style="--fill-width: 2%"></div></div>
+                </div>
+                <div class="result-card positive">
+                    <div class="result-book">Hard Rock</div>
+                    <div class="result-amount">+$250</div>
+                    <div class="result-bar"><div class="result-bar-fill" style="--fill-width: 2%"></div></div>
+                </div>
+                <div class="result-card negative">
+                    <div class="result-book">ESPN BET</div>
+                    <div class="result-amount">-$274.12</div>
+                    <div class="result-bar"><div class="result-bar-fill negative-fill" style="--fill-width: 2%"></div></div>
+                </div>
+                <div class="result-card negative">
+                    <div class="result-book">Underdog</div>
+                    <div class="result-amount">-$2,622</div>
+                    <div class="result-bar"><div class="result-bar-fill negative-fill" style="--fill-width: 22%"></div></div>
+                </div>
                 <div class="result-card negative">
                     <div class="result-book">BetMGM</div>
-                    <div class="result-amount">-$2,700</div>
+                    <div class="result-amount">-$2,745.72</div>
                     <div class="result-bar"><div class="result-bar-fill negative-fill" style="--fill-width: 23%"></div></div>
                 </div>
             </div>
@@ -316,25 +358,66 @@
                 <p><strong>How to play:</strong> Pick the team you think will cover the spread. $100 per bet. Spreads are fair-value lines derived from nfelo ratings and EPA per play. The green line tracks your actual P&amp;L, the yellow dashed line tracks expected P&amp;L based on each bet's implied win probability.</p>
             </div>
             <div class="game-wrapper">
-                <div class="game-bankroll">
-                    <span class="game-bankroll-label">Bankroll</span>
-                    <span class="game-bankroll-value" id="gameBankroll">$1,000</span>
+                <!-- How to Play -->
+                <div class="game-explainer">
+                    <button class="game-explainer-toggle" id="explainerToggle">
+                        <span>How to Play</span>
+                        <span class="explainer-arrow" id="explainerArrow">&#9662;</span>
+                    </button>
+                    <div class="game-explainer-content" id="explainerContent">
+                        <p>Each matchup simulates an NFL game using <strong>nfelo power ratings</strong> (from nfeloapp.com) blended with <strong>offense, defense, and total DVOA</strong> (Football Outsiders) to calculate a true fair-value spread. The DVOA matchup factors in how each offense performs against the opponent's specific defense. Home field is worth ~2.6 points.</p>
+                        <p>The posted spread is based on that fair value, but <strong>it's intentionally biased up to &plusmn;4 points</strong>. Your job is to spot when the line is off. When you see a big misprice, bet heavy — when it looks fair, bet small or skip.</p>
+                        <p>Scores are generated from a historical NFL score distribution so they land on realistic key numbers (3s and 7s). After each bet, you'll see the <strong>fair value spread</strong> — compare it to the posted line to see whether you had the edge.</p>
+                        <p>Game results use realistic NFL variance (~13.5 pt std dev). Green = covered, Red = didn&rsquo;t. Think like a sharp.</p>
+                    </div>
                 </div>
-                <div class="game-record" id="gameRecord">0-0</div>
+
+                <!-- Stats Row -->
+                <div class="game-stats-row">
+                    <div class="game-stat-block">
+                        <span class="game-stat-label">Bankroll</span>
+                        <span class="game-bankroll-value" id="gameBankroll">$1,000</span>
+                    </div>
+                    <div class="game-stat-block">
+                        <span class="game-stat-label">Record</span>
+                        <span class="game-stat-value" id="gameRecord">0-0</span>
+                    </div>
+                    <div class="game-stat-block">
+                        <span class="game-stat-label">Best Run</span>
+                        <span class="game-stat-value game-stat-best" id="gameBestRun">--</span>
+                    </div>
+                </div>
+
+                <!-- Game Card -->
                 <div class="game-card" id="gameCard">
+                    <div class="game-matchup-header" id="matchupHeader">-- @ --</div>
                     <div class="game-matchup">
                         <button class="game-team" id="awayTeam" data-side="away">
+                            <span class="game-team-label">Away</span>
                             <span class="game-team-name" id="awayName">--</span>
                             <span class="game-team-spread" id="awaySpread">--</span>
                         </button>
                         <div class="game-vs">
-                            <span>VS</span>
-                            <div class="game-bet-amount">$100 / bet</div>
+                            <span>@</span>
                         </div>
                         <button class="game-team" id="homeTeam" data-side="home">
+                            <span class="game-team-label">Home</span>
                             <span class="game-team-name" id="homeName">--</span>
                             <span class="game-team-spread" id="homeSpread">--</span>
                         </button>
+                    </div>
+                    <div class="game-wager">
+                        <label class="game-wager-label" for="wagerInput">Wager</label>
+                        <div class="game-wager-controls">
+                            <button class="wager-preset" data-amount="50">$50</button>
+                            <button class="wager-preset" data-amount="100">$100</button>
+                            <button class="wager-preset" data-amount="250">$250</button>
+                            <button class="wager-preset" data-amount="500">$500</button>
+                            <div class="game-wager-input-wrap">
+                                <span class="wager-dollar">$</span>
+                                <input type="number" id="wagerInput" class="game-wager-input" value="100" min="1" step="1">
+                            </div>
+                        </div>
                     </div>
                     <div class="game-result" id="gameResult"></div>
                 </div>
@@ -357,6 +440,9 @@
                 <span class="footer-name">Leo Minichillo</span>
                 <div class="footer-links">
                     <a href="https://polymarket.com/profile/0xc42e3Ad86BD9233631b5d494D29eA8aCaa25EdBd" target="_blank" rel="noopener">Polymarket</a>
+                    <a href="https://www.linkedin.com/in/leo-minichillo/" target="_blank" rel="noopener">LinkedIn</a>
+                    <a href="https://github.com/Leo-Minichillo" target="_blank" rel="noopener">GitHub</a>
+                    <a href="https://x.com/leo_minichillo" target="_blank" rel="noopener">X</a>
                 </div>
             </div>
         </div>
