@@ -209,6 +209,7 @@
         losses: 0,
         pushes: 0,
         gamesPlayed: 0,
+        totalWagered: 0,
         awayTeam: '',
         homeTeam: '',
         spread: 0,      // posted line (biased from fair value)
@@ -406,6 +407,8 @@
 
     var bankrollEl = document.getElementById('gameBankroll');
     var recordEl = document.getElementById('gameRecord');
+    var winRateEl = document.getElementById('gameWinRate');
+    var roiEl = document.getElementById('gameROI');
     var bestRunEl = document.getElementById('gameBestRun');
     var matchupHeaderEl = document.getElementById('matchupHeader');
     var awayNameEl = document.getElementById('awayName');
@@ -529,6 +532,7 @@
 
             // Update bankroll
             gameState.gamesPlayed++;
+            gameState.totalWagered += gameState.wager;
             if (isPush) {
                 gameState.pushes++;
             } else if (userWon) {
@@ -543,6 +547,18 @@
             bankrollEl.className = 'game-bankroll-value' + (gameState.bankroll < 1000 ? ' negative' : '');
             recordEl.textContent = gameState.wins + '-' + gameState.losses + (gameState.pushes > 0 ? '-' + gameState.pushes : '');
             saveBestRun();
+
+            // Win rate + ROI
+            var resolvedBets = gameState.wins + gameState.losses;
+            if (resolvedBets > 0) {
+                var winRate = gameState.wins / resolvedBets * 100;
+                winRateEl.textContent = winRate.toFixed(1) + '%';
+            }
+            if (gameState.totalWagered > 0) {
+                var roi = (gameState.bankroll - 1000) / gameState.totalWagered * 100;
+                roiEl.textContent = (roi >= 0 ? '+' : '') + roi.toFixed(1) + '%';
+                roiEl.className = 'game-stat-value' + (roi > 0 ? ' positive' : roi < 0 ? ' negative' : '');
+            }
 
             // Show who covered (ATS result)
             if (coverMargin > 0) {
@@ -588,10 +604,25 @@
                 ' &nbsp;·&nbsp; <span class="fv-edge">' + edgePts + ' pt edge — ' + edgeSide + ' side</span>' +
                 '</span>';
 
+            // Flavor text based on user's edge
+            var userEdge = (side === 'home') ? edge : -edge;
+            var flavorText;
+            if (userEdge >= 3) {
+                flavorText = 'Sharp play \u2014 big misprice.';
+            } else if (userEdge >= 1.5) {
+                flavorText = 'Solid edge.';
+            } else if (userEdge >= 0) {
+                flavorText = 'Thin edge \u2014 coin flip territory.';
+            } else {
+                flavorText = 'You were on the wrong side of this one.';
+            }
+            var flavorHTML = '<span class="game-flavor">' + flavorText + '</span>';
+
             resultEl.innerHTML =
                 '<span class="game-result-score">' + gameState.awayTeam + ' ' + scores.away + '  —  ' + scores.home + ' ' + gameState.homeTeam + '</span>' +
                 '<span class="game-result-outcome ' + outcomeClass + '">' + outcomeText + '</span>' +
-                fairValueHTML;
+                fairValueHTML +
+                flavorHTML;
 
             if (gameState.bankroll <= 0) {
                 setTimeout(function () {
@@ -622,9 +653,13 @@
                 gameState.losses = 0;
                 gameState.pushes = 0;
                 gameState.gamesPlayed = 0;
+                gameState.totalWagered = 0;
                 bankrollEl.textContent = '$1,000';
                 bankrollEl.className = 'game-bankroll-value';
                 recordEl.textContent = '0-0';
+                winRateEl.textContent = '--%';
+                roiEl.textContent = '--%';
+                roiEl.className = 'game-stat-value';
                 wagerInput.value = 100;
                 betHistory = [{ actualPnl: 0, expectedPnl: 0 }];
                 drawChart();
