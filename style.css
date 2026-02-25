@@ -1002,6 +1002,14 @@ section {
     color: var(--accent);
 }
 
+.game-stat-value.positive {
+    color: var(--accent);
+}
+
+.game-stat-value.negative {
+    color: var(--negative);
+}
+
 /* Game Card */
 .game-card {
     background: var(--bg-card);
@@ -1257,6 +1265,13 @@ section {
 
 .fv-edge {
     color: #fbbf24;
+}
+
+.game-flavor {
+    font-size: 0.72rem;
+    color: var(--text-dim);
+    font-style: italic;
+    margin-top: 2px;
 }
 
 .game-deal-btn {
