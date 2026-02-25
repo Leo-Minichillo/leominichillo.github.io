@@ -5,9 +5,155 @@
 (function () {
     'use strict';
 
+    // ---- Ticker Bar (Live Asset Prices) ----
+    (function setupTicker() {
+        var tickerTrack = document.getElementById('tickerTrack');
+        if (!tickerTrack) return;
+
+        // Static data for assets (used as fallback and for Seahawks futures)
+        var tickerAssets = [
+            { symbol: 'BTC', name: 'Bitcoin', price: null, change: null, type: 'crypto', id: 'bitcoin' },
+            { symbol: 'ETH', name: 'Ethereum', price: null, change: null, type: 'crypto', id: 'ethereum' },
+            { symbol: 'SOL', name: 'Solana', price: null, change: null, type: 'crypto', id: 'solana' },
+            { symbol: 'HBAR', name: 'Hedera', price: null, change: null, type: 'crypto', id: 'hedera-hashgraph' },
+            { symbol: 'GOOGL', name: 'Google', price: null, change: null, type: 'stock' },
+            { symbol: 'TSM', name: 'TSMC', price: null, change: null, type: 'stock' },
+            { symbol: 'CAVA', name: 'Cava', price: null, change: null, type: 'stock' },
+            { symbol: 'SEA', name: 'Seahawks SB Odds', price: null, change: null, type: 'futures' }
+        ];
+
+        // Fallback values if APIs fail
+        var fallbackData = {
+            'BTC': { price: 96000, change: 1.2 },
+            'ETH': { price: 2700, change: -0.5 },
+            'SOL': { price: 170, change: 2.3 },
+            'HBAR': { price: 0.22, change: 3.1 },
+            'GOOGL': { price: 182, change: 0.8 },
+            'TSM': { price: 205, change: 1.1 },
+            'CAVA': { price: 110, change: -1.4 },
+            'SEA': { price: null, change: null }
+        };
+
+        // Seahawks futures odds (hardcoded — no free odds API)
+        var seahawksOdds = '+2500';
+
+        function formatPrice(price, symbol) {
+            if (price === null) return '--';
+            if (price >= 1000) return '$' + price.toLocaleString(undefined, { maximumFractionDigits: 0 });
+            if (price >= 1) return '$' + price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            return '$' + price.toFixed(4);
+        }
+
+        function formatChange(change) {
+            if (change === null) return '';
+            var sign = change >= 0 ? '+' : '';
+            return sign + change.toFixed(2) + '%';
+        }
+
+        // Generate a deterministic mini sparkline from price
+        function generateSparkline(seed, isPositive) {
+            var points = [];
+            var s = Math.abs(seed || 1);
+            for (var i = 0; i < 7; i++) {
+                s = (s * 9301 + 49297) % 233280;
+                points.push(1 + (s / 233280) * 8);
+            }
+            // Trend upward if positive, downward if negative
+            if (isPositive) {
+                points[points.length - 1] = Math.min(points[points.length - 1] + 2, 10);
+                points[0] = Math.max(points[0] - 2, 1);
+            } else {
+                points[0] = Math.min(points[0] + 2, 10);
+                points[points.length - 1] = Math.max(points[points.length - 1] - 2, 1);
+            }
+            var step = 36 / (points.length - 1);
+            var coords = points.map(function (y, i) { return Math.round(i * step) + ',' + y.toFixed(1); }).join(' ');
+            var color = isPositive ? '#10b981' : '#ef4444';
+            return '<svg class="ticker-spark" viewBox="0 0 36 12"><polyline points="' + coords + '" fill="none" stroke="' + color + '" stroke-width="1.2" stroke-linecap="round"/></svg>';
+        }
+
+        function renderTicker() {
+            var html = '';
+            for (var i = 0; i < tickerAssets.length; i++) {
+                var a = tickerAssets[i];
+                var fb = fallbackData[a.symbol];
+                var price = a.price !== null ? a.price : (fb ? fb.price : null);
+                var change = a.change !== null ? a.change : (fb ? fb.change : null);
+                var isPositive = change !== null ? change >= 0 : true;
+                var changeClass = isPositive ? 'positive' : 'negative';
+
+                html += '<span class="ticker-item">';
+                html += '<span class="ticker-symbol">' + a.symbol + '</span>';
+
+                if (a.type === 'futures') {
+                    html += '<span class="ticker-price">' + seahawksOdds + '</span>';
+                    html += generateSparkline(2500, true);
+                } else {
+                    html += '<span class="ticker-price">' + formatPrice(price, a.symbol) + '</span>';
+                    if (change !== null) {
+                        html += '<span class="ticker-change ' + changeClass + '">' + formatChange(change) + '</span>';
+                    }
+                    html += generateSparkline(price, isPositive);
+                }
+
+                html += '</span>';
+                if (i < tickerAssets.length - 1) {
+                    html += '<span class="ticker-sep">\u00b7</span>';
+                }
+            }
+            // Duplicate for seamless loop
+            tickerTrack.innerHTML = html + '<span class="ticker-sep">\u00b7</span>' + html;
+        }
+
+        // Initial render with fallbacks
+        renderTicker();
+
+        // Fetch crypto prices from CoinGecko (free, no key, CORS enabled)
+        function fetchCrypto() {
+            var ids = tickerAssets.filter(function (a) { return a.type === 'crypto'; }).map(function (a) { return a.id; }).join(',');
+            fetch('https://api.coingecko.com/api/v3/simple/price?ids=' + ids + '&vs_currencies=usd&include_24hr_change=true')
+                .then(function (res) { return res.json(); })
+                .then(function (data) {
+                    tickerAssets.forEach(function (a) {
+                        if (a.type === 'crypto' && data[a.id]) {
+                            a.price = data[a.id].usd;
+                            a.change = data[a.id].usd_24h_change;
+                        }
+                    });
+                    renderTicker();
+                })
+                .catch(function () { /* keep fallback values */ });
+        }
+
+        // Fetch stock prices from Finnhub (free tier, requires API key)
+        // To use: replace FINNHUB_API_KEY with your free key from https://finnhub.io/
+        var FINNHUB_API_KEY = 'demo';
+
+        function fetchStocks() {
+            var stocks = tickerAssets.filter(function (a) { return a.type === 'stock'; });
+            stocks.forEach(function (asset) {
+                fetch('https://finnhub.io/api/v1/quote?symbol=' + asset.symbol + '&token=' + FINNHUB_API_KEY)
+                    .then(function (res) { return res.json(); })
+                    .then(function (data) {
+                        if (data && data.c && data.c > 0) {
+                            asset.price = data.c;
+                            asset.change = data.dp;
+                            renderTicker();
+                        }
+                    })
+                    .catch(function () { /* keep fallback values */ });
+            });
+        }
+
+        fetchCrypto();
+        fetchStocks();
+    })();
+
     // ---- Navbar scroll effect ----
     const navbar = document.getElementById('navbar');
     let lastScroll = 0;
+
+    var resultsInView = false;
 
     function handleScroll() {
         const scrollY = window.scrollY;
@@ -17,6 +163,11 @@
             navbar.classList.remove('scrolled');
         }
         lastScroll = scrollY;
+
+        // Scroll-driven result bar animation
+        if (resultsInView) {
+            handleResultsParallax();
+        }
     }
 
     window.addEventListener('scroll', handleScroll, { passive: true });
@@ -106,21 +257,70 @@
         statObserver.observe(heroStat);
     }
 
-    // ---- Result bar animation ----
-    var resultBars = document.querySelectorAll('.result-bar-fill');
-    var barObserver = new IntersectionObserver(function (entries) {
-        entries.forEach(function (entry) {
-            if (entry.isIntersecting) {
-                entry.target.style.width = entry.target.style.getPropertyValue('--fill-width');
-                barObserver.unobserve(entry.target);
+    // ---- Scroll-driven result bar animation + parallax ----
+    var resultCards = document.querySelectorAll('.result-card');
+    var resultsSection = document.getElementById('results');
+    var prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    function handleResultsParallax() {
+        var vh = window.innerHeight;
+        resultCards.forEach(function (card) {
+            var rect = card.getBoundingClientRect();
+            var bar = card.querySelector('.result-bar-fill');
+            if (!bar) return;
+
+            var fillTarget = parseFloat(bar.style.getPropertyValue('--fill-width')) || 0;
+
+            // Progress: 0 when card bottom edge enters viewport, 1 when card is fully in view
+            var progress = (vh - rect.top) / (vh * 0.6);
+            progress = Math.max(0, Math.min(1, progress));
+
+            // Ease the progress for a smoother feel
+            var eased = progress < 0.5
+                ? 2 * progress * progress
+                : 1 - Math.pow(-2 * progress + 2, 2) / 2;
+
+            bar.style.width = (eased * fillTarget) + '%';
+
+            // Subtle parallax: cards shift slightly based on distance from viewport center
+            if (!prefersReducedMotion) {
+                var centerOffset = (rect.top + rect.height / 2 - vh / 2) / vh;
+                card.style.transform = 'translateY(' + (centerOffset * 12).toFixed(1) + 'px)';
             }
         });
-    }, { threshold: 0.3 });
+    }
 
-    resultBars.forEach(function (bar) {
-        bar.style.width = '0%';
-        barObserver.observe(bar);
-    });
+    if (resultsSection) {
+        // Initialize bar widths to 0 and store target in CSS var
+        resultCards.forEach(function (card) {
+            var bar = card.querySelector('.result-bar-fill');
+            if (bar) bar.style.width = '0%';
+        });
+
+        if (prefersReducedMotion) {
+            // Fallback: one-shot animation for reduced motion
+            var barObserver = new IntersectionObserver(function (entries) {
+                entries.forEach(function (entry) {
+                    if (entry.isIntersecting) {
+                        var bar = entry.target.querySelector('.result-bar-fill');
+                        if (bar) {
+                            bar.style.transition = 'width 1s ease';
+                            bar.style.width = bar.style.getPropertyValue('--fill-width');
+                        }
+                        barObserver.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.3 });
+            resultCards.forEach(function (card) { barObserver.observe(card); });
+        } else {
+            // Scroll-driven: toggle resultsInView flag
+            var resultsObserver = new IntersectionObserver(function (entries) {
+                resultsInView = entries[0].isIntersecting;
+                if (resultsInView) handleResultsParallax();
+            }, { threshold: 0 });
+            resultsObserver.observe(resultsSection);
+        }
+    }
 
     // ---- Smooth scroll for nav links ----
     document.querySelectorAll('a[href^="#"]').forEach(function (anchor) {
