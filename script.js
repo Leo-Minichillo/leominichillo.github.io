@@ -8,36 +8,41 @@
     // ---- Ticker Bar (Live Asset Prices) ----
     (function setupTicker() {
         var tickerTrack = document.getElementById('tickerTrack');
-        if (!tickerTrack) return;
+        var tickerBar = document.getElementById('tickerBar');
+        if (!tickerTrack || !tickerBar) return;
 
-        // Static data for assets (used as fallback and for Seahawks futures)
         var tickerAssets = [
-            { symbol: 'BTC', name: 'Bitcoin', price: null, change: null, type: 'crypto', id: 'bitcoin' },
-            { symbol: 'ETH', name: 'Ethereum', price: null, change: null, type: 'crypto', id: 'ethereum' },
-            { symbol: 'SOL', name: 'Solana', price: null, change: null, type: 'crypto', id: 'solana' },
-            { symbol: 'HBAR', name: 'Hedera', price: null, change: null, type: 'crypto', id: 'hedera-hashgraph' },
-            { symbol: 'GOOGL', name: 'Google', price: null, change: null, type: 'stock' },
-            { symbol: 'TSM', name: 'TSMC', price: null, change: null, type: 'stock' },
-            { symbol: 'CAVA', name: 'Cava', price: null, change: null, type: 'stock' },
-            { symbol: 'SEA', name: 'Seahawks SB Odds', price: null, change: null, type: 'futures' }
+            { symbol: 'BTC', name: 'Bitcoin', price: null, changes: {}, type: 'crypto', id: 'bitcoin' },
+            { symbol: 'ETH', name: 'Ethereum', price: null, changes: {}, type: 'crypto', id: 'ethereum' },
+            { symbol: 'SOL', name: 'Solana', price: null, changes: {}, type: 'crypto', id: 'solana' },
+            { symbol: 'HBAR', name: 'Hedera', price: null, changes: {}, type: 'crypto', id: 'hedera-hashgraph' },
+            { symbol: 'GOOGL', name: 'Google', price: null, changes: {}, type: 'stock' },
+            { symbol: 'TSM', name: 'TSMC', price: null, changes: {}, type: 'stock' },
+            { symbol: 'CAVA', name: 'Cava', price: null, changes: {}, type: 'stock' }
         ];
 
         // Fallback values if APIs fail
         var fallbackData = {
-            'BTC': { price: 96000, change: 1.2 },
-            'ETH': { price: 2700, change: -0.5 },
-            'SOL': { price: 170, change: 2.3 },
-            'HBAR': { price: 0.22, change: 3.1 },
-            'GOOGL': { price: 182, change: 0.8 },
-            'TSM': { price: 205, change: 1.1 },
-            'CAVA': { price: 110, change: -1.4 },
-            'SEA': { price: null, change: null }
+            'BTC':   { price: 96000, changes: { '24h': 1.2, '7d': 4.5, '30d': 12.3, '1y': 85.2 } },
+            'ETH':   { price: 2700,  changes: { '24h': -0.5, '7d': 2.1, '30d': -8.4, '1y': 35.6 } },
+            'SOL':   { price: 170,   changes: { '24h': 2.3, '7d': 8.7, '30d': 15.1, '1y': 120.4 } },
+            'HBAR':  { price: 0.22,  changes: { '24h': 3.1, '7d': 5.2, '30d': -2.8, '1y': 45.3 } },
+            'GOOGL': { price: 182,   changes: { '24h': 0.8 } },
+            'TSM':   { price: 205,   changes: { '24h': 1.1 } },
+            'CAVA':  { price: 110,   changes: { '24h': -1.4 } }
         };
 
-        // Seahawks futures odds (hardcoded — no free odds API)
-        var seahawksOdds = '+2500';
+        // Timeframe cycling
+        var timeframes = ['24h', '7d', '30d', '1y'];
+        var currentTfIndex = 0;
 
-        function formatPrice(price, symbol) {
+        // Add timeframe label to ticker bar
+        var tfLabel = document.createElement('span');
+        tfLabel.className = 'ticker-tf-label';
+        tfLabel.textContent = '24h';
+        tickerBar.insertBefore(tfLabel, tickerTrack);
+
+        function formatPrice(price) {
             if (price === null) return '--';
             if (price >= 1000) return '$' + price.toLocaleString(undefined, { maximumFractionDigits: 0 });
             if (price >= 1) return '$' + price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -45,7 +50,7 @@
         }
 
         function formatChange(change) {
-            if (change === null) return '';
+            if (change === null || change === undefined) return '';
             var sign = change >= 0 ? '+' : '';
             return sign + change.toFixed(2) + '%';
         }
@@ -58,7 +63,6 @@
                 s = (s * 9301 + 49297) % 233280;
                 points.push(1 + (s / 233280) * 8);
             }
-            // Trend upward if positive, downward if negative
             if (isPositive) {
                 points[points.length - 1] = Math.min(points[points.length - 1] + 2, 10);
                 points[0] = Math.max(points[0] - 2, 1);
@@ -73,29 +77,26 @@
         }
 
         function renderTicker() {
+            var tf = timeframes[currentTfIndex];
             var html = '';
             for (var i = 0; i < tickerAssets.length; i++) {
                 var a = tickerAssets[i];
                 var fb = fallbackData[a.symbol];
                 var price = a.price !== null ? a.price : (fb ? fb.price : null);
-                var change = a.change !== null ? a.change : (fb ? fb.change : null);
+
+                // Get change for current timeframe (stocks only have 24h)
+                var assetChanges = Object.keys(a.changes).length > 0 ? a.changes : (fb ? fb.changes : {});
+                var change = assetChanges[tf] !== undefined ? assetChanges[tf] : (assetChanges['24h'] !== undefined ? assetChanges['24h'] : null);
                 var isPositive = change !== null ? change >= 0 : true;
                 var changeClass = isPositive ? 'positive' : 'negative';
 
                 html += '<span class="ticker-item">';
                 html += '<span class="ticker-symbol">' + a.symbol + '</span>';
-
-                if (a.type === 'futures') {
-                    html += '<span class="ticker-price">' + seahawksOdds + '</span>';
-                    html += generateSparkline(2500, true);
-                } else {
-                    html += '<span class="ticker-price">' + formatPrice(price, a.symbol) + '</span>';
-                    if (change !== null) {
-                        html += '<span class="ticker-change ' + changeClass + '">' + formatChange(change) + '</span>';
-                    }
-                    html += generateSparkline(price, isPositive);
+                html += '<span class="ticker-price">' + formatPrice(price) + '</span>';
+                if (change !== null) {
+                    html += '<span class="ticker-change ' + changeClass + '">' + formatChange(change) + '</span>';
                 }
-
+                html += generateSparkline(price, isPositive);
                 html += '</span>';
                 if (i < tickerAssets.length - 1) {
                     html += '<span class="ticker-sep">\u00b7</span>';
@@ -104,6 +105,13 @@
             // Duplicate for seamless loop
             tickerTrack.innerHTML = html + '<span class="ticker-sep">\u00b7</span>' + html;
         }
+
+        // Cycle timeframes every 5 seconds
+        setInterval(function () {
+            currentTfIndex = (currentTfIndex + 1) % timeframes.length;
+            tfLabel.textContent = timeframes[currentTfIndex];
+            renderTicker();
+        }, 5000);
 
         // ---- Cache helpers (max 1 API call per hour per source) ----
         var CACHE_TTL = 60 * 60 * 1000; // 1 hour in ms
@@ -122,13 +130,18 @@
             try { localStorage.setItem(key, JSON.stringify({ ts: Date.now(), data: data })); } catch (e) {}
         }
 
-        // Apply fetched/cached data to tickerAssets and re-render
-        function applyCryptoData(data) {
-            tickerAssets.forEach(function (a) {
-                if (a.type === 'crypto' && data[a.id]) {
-                    a.price = data[a.id].usd;
-                    a.change = data[a.id].usd_24h_change;
-                }
+        // Apply fetched/cached crypto data (from /coins/markets)
+        function applyCryptoData(coins) {
+            coins.forEach(function (coin) {
+                var asset = tickerAssets.find(function (a) { return a.id === coin.id; });
+                if (!asset) return;
+                asset.price = coin.current_price;
+                asset.changes = {
+                    '24h': coin.price_change_percentage_24h || null,
+                    '7d': coin.price_change_percentage_7d_in_currency || null,
+                    '30d': coin.price_change_percentage_30d_in_currency || null,
+                    '1y': coin.price_change_percentage_1y_in_currency || null
+                };
             });
             renderTicker();
         }
@@ -138,7 +151,7 @@
                 var asset = tickerAssets.find(function (a) { return a.symbol === item.symbol; });
                 if (asset) {
                     asset.price = item.price;
-                    asset.change = item.change;
+                    asset.changes = { '24h': item.change };
                 }
             });
             renderTicker();
@@ -147,22 +160,24 @@
         // Initial render with fallbacks
         renderTicker();
 
-        // Fetch crypto prices from CoinGecko (free, no key, CORS enabled)
+        // Fetch crypto from CoinGecko /coins/markets (includes multi-timeframe changes)
         function fetchCrypto() {
             var cached = getCached('ticker_crypto');
             if (cached) { applyCryptoData(cached); return; }
 
             var ids = tickerAssets.filter(function (a) { return a.type === 'crypto'; }).map(function (a) { return a.id; }).join(',');
-            fetch('https://api.coingecko.com/api/v3/simple/price?ids=' + ids + '&vs_currencies=usd&include_24hr_change=true')
+            fetch('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=' + ids + '&price_change_percentage=7d,30d,1y')
                 .then(function (res) { return res.json(); })
                 .then(function (data) {
-                    setCache('ticker_crypto', data);
-                    applyCryptoData(data);
+                    if (Array.isArray(data) && data.length > 0) {
+                        setCache('ticker_crypto', data);
+                        applyCryptoData(data);
+                    }
                 })
                 .catch(function () { /* keep fallback values */ });
         }
 
-        // Fetch stock prices from Finnhub (free tier)
+        // Fetch stock prices from Finnhub (free tier, 24h change only)
         var FINNHUB_API_KEY = 'd6fndhpr01qqnmbpau5gd6fndhpr01qqnmbpau60';
 
         function fetchStocks() {
