@@ -105,43 +105,92 @@
             tickerTrack.innerHTML = html + '<span class="ticker-sep">\u00b7</span>' + html;
         }
 
+        // ---- Cache helpers (max 1 API call per hour per source) ----
+        var CACHE_TTL = 60 * 60 * 1000; // 1 hour in ms
+
+        function getCached(key) {
+            try {
+                var raw = localStorage.getItem(key);
+                if (!raw) return null;
+                var cached = JSON.parse(raw);
+                if (Date.now() - cached.ts < CACHE_TTL) return cached.data;
+            } catch (e) {}
+            return null;
+        }
+
+        function setCache(key, data) {
+            try { localStorage.setItem(key, JSON.stringify({ ts: Date.now(), data: data })); } catch (e) {}
+        }
+
+        // Apply fetched/cached data to tickerAssets and re-render
+        function applyCryptoData(data) {
+            tickerAssets.forEach(function (a) {
+                if (a.type === 'crypto' && data[a.id]) {
+                    a.price = data[a.id].usd;
+                    a.change = data[a.id].usd_24h_change;
+                }
+            });
+            renderTicker();
+        }
+
+        function applyStockData(stockResults) {
+            stockResults.forEach(function (item) {
+                var asset = tickerAssets.find(function (a) { return a.symbol === item.symbol; });
+                if (asset) {
+                    asset.price = item.price;
+                    asset.change = item.change;
+                }
+            });
+            renderTicker();
+        }
+
         // Initial render with fallbacks
         renderTicker();
 
         // Fetch crypto prices from CoinGecko (free, no key, CORS enabled)
         function fetchCrypto() {
+            var cached = getCached('ticker_crypto');
+            if (cached) { applyCryptoData(cached); return; }
+
             var ids = tickerAssets.filter(function (a) { return a.type === 'crypto'; }).map(function (a) { return a.id; }).join(',');
             fetch('https://api.coingecko.com/api/v3/simple/price?ids=' + ids + '&vs_currencies=usd&include_24hr_change=true')
                 .then(function (res) { return res.json(); })
                 .then(function (data) {
-                    tickerAssets.forEach(function (a) {
-                        if (a.type === 'crypto' && data[a.id]) {
-                            a.price = data[a.id].usd;
-                            a.change = data[a.id].usd_24h_change;
-                        }
-                    });
-                    renderTicker();
+                    setCache('ticker_crypto', data);
+                    applyCryptoData(data);
                 })
                 .catch(function () { /* keep fallback values */ });
         }
 
-        // Fetch stock prices from Finnhub (free tier, requires API key)
-        // To use: replace FINNHUB_API_KEY with your free key from https://finnhub.io/
-        var FINNHUB_API_KEY = 'demo';
+        // Fetch stock prices from Finnhub (free tier)
+        var FINNHUB_API_KEY = 'd6fndhpr01qqnmbpau5gd6fndhpr01qqnmbpau60';
 
         function fetchStocks() {
+            var cached = getCached('ticker_stocks');
+            if (cached) { applyStockData(cached); return; }
+
             var stocks = tickerAssets.filter(function (a) { return a.type === 'stock'; });
+            var results = [];
+            var done = 0;
+
             stocks.forEach(function (asset) {
                 fetch('https://finnhub.io/api/v1/quote?symbol=' + asset.symbol + '&token=' + FINNHUB_API_KEY)
                     .then(function (res) { return res.json(); })
                     .then(function (data) {
                         if (data && data.c && data.c > 0) {
-                            asset.price = data.c;
-                            asset.change = data.dp;
-                            renderTicker();
+                            results.push({ symbol: asset.symbol, price: data.c, change: data.dp });
                         }
                     })
-                    .catch(function () { /* keep fallback values */ });
+                    .catch(function () {})
+                    .finally(function () {
+                        done++;
+                        if (done === stocks.length) {
+                            if (results.length > 0) {
+                                setCache('ticker_stocks', results);
+                                applyStockData(results);
+                            }
+                        }
+                    });
             });
         }
 
