@@ -29,7 +29,7 @@
 
 html {
     scroll-behavior: smooth;
-    scroll-padding-top: 80px;
+    scroll-padding-top: 112px;
 }
 
 body {
@@ -53,10 +53,82 @@ a {
     padding: 0 24px;
 }
 
+/* ---- Ticker Bar ---- */
+.ticker-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1001;
+    height: 32px;
+    background: var(--bg-card);
+    border-bottom: 1px solid var(--border);
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+}
+
+.ticker-track {
+    display: flex;
+    white-space: nowrap;
+    animation: tickerScroll 40s linear infinite;
+}
+
+.ticker-bar:hover .ticker-track {
+    animation-play-state: paused;
+}
+
+@keyframes tickerScroll {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+}
+
+.ticker-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    font-weight: 500;
+    color: var(--text-muted);
+    padding: 0 8px;
+    cursor: default;
+}
+
+.ticker-item .ticker-symbol {
+    color: var(--text);
+    font-weight: 600;
+}
+
+.ticker-item .ticker-price {
+    color: var(--text-muted);
+}
+
+.ticker-item .ticker-change.positive {
+    color: var(--accent);
+}
+
+.ticker-item .ticker-change.negative {
+    color: var(--negative);
+}
+
+.ticker-spark {
+    width: 36px;
+    height: 10px;
+    vertical-align: middle;
+}
+
+.ticker-sep {
+    color: var(--border-light);
+    font-size: 0.6rem;
+    padding: 0 6px;
+    user-select: none;
+}
+
 /* ---- Navigation ---- */
 #navbar {
     position: fixed;
-    top: 0;
+    top: 32px;
     left: 0;
     right: 0;
     z-index: 1000;
@@ -170,7 +242,7 @@ a {
     justify-content: center;
     position: relative;
     overflow: hidden;
-    padding: 120px 24px 80px;
+    padding: 152px 24px 80px;
 }
 
 .hero-bg {
@@ -687,10 +759,9 @@ section {
 
 .result-bar-fill {
     height: 100%;
-    width: var(--fill-width, 0%);
+    width: 0%;
     background: var(--accent);
     border-radius: 2px;
-    transition: width 1s ease;
 }
 
 .result-bar-fill.negative-fill {
@@ -1430,6 +1501,22 @@ footer {
 
 /* ---- Responsive ---- */
 @media (max-width: 768px) {
+    .ticker-bar {
+        display: none;
+    }
+
+    #navbar {
+        top: 0;
+    }
+
+    html {
+        scroll-padding-top: 80px;
+    }
+
+    #hero {
+        padding-top: 120px;
+    }
+
     .nav-links {
         display: none;
     }
@@ -1517,6 +1604,16 @@ footer {
 
     .btn {
         justify-content: center;
+    }
+}
+
+/* ---- Reduced Motion ---- */
+@media (prefers-reduced-motion: reduce) {
+    .ticker-track {
+        animation-duration: 80s;
+    }
+    .result-bar-fill {
+        transition: width 1s ease;
     }
 }
 
