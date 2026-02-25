@@ -354,9 +354,6 @@
                 <h2>Beat the Spread</h2>
             </div>
             <p class="game-source">Spreads calculated from 2025-26 nfelo ratings + EPA per play</p>
-            <div class="game-how-to-play">
-                <p><strong>How to play:</strong> Pick the team you think will cover the spread. $100 per bet. Spreads are fair-value lines derived from nfelo ratings and EPA per play. The green line tracks your actual P&amp;L, the yellow dashed line tracks expected P&amp;L based on each bet's implied win probability.</p>
-            </div>
             <div class="game-wrapper">
                 <!-- How to Play -->
                 <div class="game-explainer">
@@ -365,10 +362,10 @@
                         <span class="explainer-arrow" id="explainerArrow">&#9662;</span>
                     </button>
                     <div class="game-explainer-content" id="explainerContent">
-                        <p>Each matchup simulates an NFL game using <strong>nfelo power ratings</strong> (from nfeloapp.com) blended with <strong>offense, defense, and total DVOA</strong> (Football Outsiders) to calculate a true fair-value spread. The DVOA matchup factors in how each offense performs against the opponent's specific defense. Home field is worth ~2.6 points.</p>
+                        <p>Each matchup simulates an NFL game using <strong>nfelo power ratings</strong> blended with <strong>EPA per play</strong> (offense &amp; defense) to calculate a true fair-value spread. Home field is worth ~1.7 points.</p>
                         <p>The posted spread is based on that fair value, but <strong>it's intentionally biased up to &plusmn;4 points</strong>. Your job is to spot when the line is off. When you see a big misprice, bet heavy — when it looks fair, bet small or skip.</p>
-                        <p>Scores are generated from a historical NFL score distribution so they land on realistic key numbers (3s and 7s). After each bet, you'll see the <strong>fair value spread</strong> — compare it to the posted line to see whether you had the edge.</p>
-                        <p>Game results use realistic NFL variance (~13.5 pt std dev). Green = covered, Red = didn&rsquo;t. Think like a sharp.</p>
+                        <p>After each bet, you'll see the <strong>fair value spread</strong> — compare it to the posted line to see whether you had the edge. The green P&amp;L line tracks your actual results; the yellow dashed line tracks expected P&amp;L based on each bet's implied edge.</p>
+                        <p>Scores use a bivariate normal model around EPA-derived team means (~10.5 pt std dev). Green = covered, Red = didn&rsquo;t. Think like a sharp.</p>
                     </div>
                 </div>
 
