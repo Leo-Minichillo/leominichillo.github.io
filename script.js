@@ -265,6 +265,15 @@
             posEl.innerHTML = html;
         }
 
+        function fallback() {
+            if (lifetimePnlEl) {
+                lifetimePnlEl.textContent = '+$7,500';
+                lifetimePnlEl.className = 'polymarket-value positive';
+            }
+            if (heroPnlEl) heroPnlEl.textContent = '$7.5k';
+            posEl.innerHTML = '';
+        }
+
         function fetchPositions() {
             var cached = getCached(CACHE_KEY);
             if (cached) { render(cached); return; }
@@ -278,11 +287,11 @@
                         setCache(CACHE_KEY, data);
                         render(data);
                     } else {
-                        posEl.innerHTML = '';
+                        fallback();
                     }
                 })
                 .catch(function () {
-                    posEl.innerHTML = '';
+                    fallback();
                 });
         }
 
