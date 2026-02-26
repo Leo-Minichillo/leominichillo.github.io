@@ -12,35 +12,25 @@
         if (!tickerTrack || !tickerBar) return;
 
         var tickerAssets = [
-            { symbol: 'BTC', name: 'Bitcoin', price: null, changes: {}, type: 'crypto', id: 'bitcoin' },
-            { symbol: 'ETH', name: 'Ethereum', price: null, changes: {}, type: 'crypto', id: 'ethereum' },
-            { symbol: 'SOL', name: 'Solana', price: null, changes: {}, type: 'crypto', id: 'solana' },
-            { symbol: 'HBAR', name: 'Hedera', price: null, changes: {}, type: 'crypto', id: 'hedera-hashgraph' },
-            { symbol: 'GOOGL', name: 'Google', price: null, changes: {}, type: 'stock' },
-            { symbol: 'TSM', name: 'TSMC', price: null, changes: {}, type: 'stock' },
-            { symbol: 'CAVA', name: 'Cava', price: null, changes: {}, type: 'stock' }
+            { symbol: 'BTC', name: 'Bitcoin', price: null, change: null, type: 'crypto', id: 'bitcoin' },
+            { symbol: 'ETH', name: 'Ethereum', price: null, change: null, type: 'crypto', id: 'ethereum' },
+            { symbol: 'SOL', name: 'Solana', price: null, change: null, type: 'crypto', id: 'solana' },
+            { symbol: 'HBAR', name: 'Hedera', price: null, change: null, type: 'crypto', id: 'hedera-hashgraph' },
+            { symbol: 'GOOGL', name: 'Google', price: null, change: null, type: 'stock' },
+            { symbol: 'TSM', name: 'TSMC', price: null, change: null, type: 'stock' },
+            { symbol: 'CAVA', name: 'Cava', price: null, change: null, type: 'stock' }
         ];
 
         // Fallback values if APIs fail
         var fallbackData = {
-            'BTC':   { price: 96000, changes: { '24h': 1.2, '7d': 4.5, '30d': 12.3, '1y': 85.2 } },
-            'ETH':   { price: 2700,  changes: { '24h': -0.5, '7d': 2.1, '30d': -8.4, '1y': 35.6 } },
-            'SOL':   { price: 170,   changes: { '24h': 2.3, '7d': 8.7, '30d': 15.1, '1y': 120.4 } },
-            'HBAR':  { price: 0.22,  changes: { '24h': 3.1, '7d': 5.2, '30d': -2.8, '1y': 45.3 } },
-            'GOOGL': { price: 182,   changes: { '24h': 0.8 } },
-            'TSM':   { price: 205,   changes: { '24h': 1.1 } },
-            'CAVA':  { price: 110,   changes: { '24h': -1.4 } }
+            'BTC':   { price: 96000, change: 1.2 },
+            'ETH':   { price: 2700,  change: -0.5 },
+            'SOL':   { price: 170,   change: 2.3 },
+            'HBAR':  { price: 0.22,  change: 3.1 },
+            'GOOGL': { price: 182,   change: 0.8 },
+            'TSM':   { price: 205,   change: 1.1 },
+            'CAVA':  { price: 110,   change: -1.4 }
         };
-
-        // Timeframe cycling
-        var timeframes = ['24h', '7d', '30d', '1y'];
-        var currentTfIndex = 0;
-
-        // Add timeframe label to ticker bar
-        var tfLabel = document.createElement('span');
-        tfLabel.className = 'ticker-tf-label';
-        tfLabel.textContent = '24h';
-        tickerBar.insertBefore(tfLabel, tickerTrack);
 
         function formatPrice(price) {
             if (price === null) return '--';
@@ -77,16 +67,12 @@
         }
 
         function renderTicker() {
-            var tf = timeframes[currentTfIndex];
             var html = '';
             for (var i = 0; i < tickerAssets.length; i++) {
                 var a = tickerAssets[i];
                 var fb = fallbackData[a.symbol];
                 var price = a.price !== null ? a.price : (fb ? fb.price : null);
-
-                // Get change for current timeframe (stocks only have 24h)
-                var assetChanges = Object.keys(a.changes).length > 0 ? a.changes : (fb ? fb.changes : {});
-                var change = assetChanges[tf] !== undefined ? assetChanges[tf] : (assetChanges['24h'] !== undefined ? assetChanges['24h'] : null);
+                var change = a.change !== null ? a.change : (fb ? fb.change : null);
                 var isPositive = change !== null ? change >= 0 : true;
                 var changeClass = isPositive ? 'positive' : 'negative';
 
@@ -106,13 +92,6 @@
             tickerTrack.innerHTML = html + '<span class="ticker-sep">\u00b7</span>' + html;
         }
 
-        // Cycle timeframes every 5 seconds
-        setInterval(function () {
-            currentTfIndex = (currentTfIndex + 1) % timeframes.length;
-            tfLabel.textContent = timeframes[currentTfIndex];
-            renderTicker();
-        }, 5000);
-
         // ---- Cache helpers (max 1 API call per hour per source) ----
         var CACHE_TTL = 60 * 60 * 1000; // 1 hour in ms
 
@@ -130,18 +109,13 @@
             try { localStorage.setItem(key, JSON.stringify({ ts: Date.now(), data: data })); } catch (e) {}
         }
 
-        // Apply fetched/cached crypto data (from /coins/markets)
-        function applyCryptoData(coins) {
-            coins.forEach(function (coin) {
+        // Apply fetched/cached crypto data
+        function applyCryptoData(data) {
+            data.forEach(function (coin) {
                 var asset = tickerAssets.find(function (a) { return a.id === coin.id; });
                 if (!asset) return;
                 asset.price = coin.current_price;
-                asset.changes = {
-                    '24h': coin.price_change_percentage_24h || null,
-                    '7d': coin.price_change_percentage_7d_in_currency || null,
-                    '30d': coin.price_change_percentage_30d_in_currency || null,
-                    '1y': coin.price_change_percentage_1y_in_currency || null
-                };
+                asset.change = coin.price_change_percentage_24h || null;
             });
             renderTicker();
         }
@@ -151,7 +125,7 @@
                 var asset = tickerAssets.find(function (a) { return a.symbol === item.symbol; });
                 if (asset) {
                     asset.price = item.price;
-                    asset.changes = { '24h': item.change };
+                    asset.change = item.change;
                 }
             });
             renderTicker();
@@ -160,13 +134,13 @@
         // Initial render with fallbacks
         renderTicker();
 
-        // Fetch crypto from CoinGecko /coins/markets (includes multi-timeframe changes)
+        // Fetch crypto from CoinGecko /coins/markets (24h change)
         function fetchCrypto() {
             var cached = getCached('ticker_crypto');
             if (cached) { applyCryptoData(cached); return; }
 
             var ids = tickerAssets.filter(function (a) { return a.type === 'crypto'; }).map(function (a) { return a.id; }).join(',');
-            fetch('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=' + ids + '&price_change_percentage=7d,30d,1y')
+            fetch('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=' + ids)
                 .then(function (res) { return res.json(); })
                 .then(function (data) {
                     if (Array.isArray(data) && data.length > 0) {
