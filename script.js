@@ -267,7 +267,7 @@
             // Lifetime P&L = open cashPnl + closed cashPnl
             var lifetimePnl = 0;
             (data.open || []).forEach(function (p) { lifetimePnl += (p.cashPnl || 0); });
-            (data.closed || []).forEach(function (p) { lifetimePnl += (p.cashPnl || 0); });
+            (data.closed || []).forEach(function (p) { lifetimePnl += (p.realizedPnl || 0); });
             updatePnl(lifetimePnl);
             renderPositions(data.open || []);
         }
