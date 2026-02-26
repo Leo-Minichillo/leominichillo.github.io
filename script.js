@@ -287,13 +287,14 @@
             posEl.innerHTML = '';
         }
 
-        // Fetch all pages from closed-positions endpoint
-        function fetchAllClosed(wallet) {
+        // Fetch all pages from an endpoint (API caps at 50 per page)
+        function fetchAllPages(url) {
             var all = [];
             var limit = 50;
             function fetchPage(offset) {
-                var url = BASE + '/closed-positions?user=' + wallet + '&limit=' + limit + '&offset=' + offset;
-                return fetch(url).then(function (r) { return r.json(); }).then(function (page) {
+                var sep = url.indexOf('?') === -1 ? '?' : '&';
+                var pageUrl = url + sep + 'limit=' + limit + '&offset=' + offset;
+                return fetch(pageUrl).then(function (r) { return r.json(); }).then(function (page) {
                     var arr = Array.isArray(page) ? page : [];
                     all = all.concat(arr);
                     if (arr.length >= limit) {
@@ -311,14 +312,15 @@
 
             posEl.innerHTML = '<span class="poly-loading">Loading positions\u2026</span>';
 
-            var openUrl = BASE + '/positions?user=' + WALLET + '&sortBy=CURRENT&sortDirection=DESC&limit=50&sizeThreshold=1';
+            var openUrl = BASE + '/positions?user=' + WALLET + '&sortBy=CURRENT&sortDirection=DESC&sizeThreshold=1';
+            var closedUrl = BASE + '/closed-positions?user=' + WALLET;
 
             Promise.all([
-                fetch(openUrl).then(function (r) { return r.json(); }),
-                fetchAllClosed(WALLET)
+                fetchAllPages(openUrl),
+                fetchAllPages(closedUrl)
             ])
             .then(function (results) {
-                var open = Array.isArray(results[0]) ? results[0] : [];
+                var open = results[0] || [];
                 var closed = results[1] || [];
                 if (open.length === 0 && closed.length === 0) { fallback(); return; }
                 var data = { open: open, closed: closed };
