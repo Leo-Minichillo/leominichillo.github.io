@@ -933,6 +933,26 @@ section {
     border-color: var(--border-light);
 }
 
+.project-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.project-github-link {
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--accent);
+    transition: opacity 0.2s;
+}
+
+.project-github-link:hover {
+    opacity: 0.8;
+}
+
 .project-status {
     display: inline-block;
     font-family: var(--mono);
@@ -944,7 +964,7 @@ section {
     background: rgba(251, 191, 36, 0.1);
     border: 1px solid rgba(251, 191, 36, 0.2);
     border-radius: 4px;
-    margin-bottom: 20px;
+    margin-bottom: 0;
     font-weight: 600;
 }
 

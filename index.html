@@ -59,7 +59,7 @@
                     <span class="stat-label">Sports Betting P&L</span>
                 </div>
                 <div class="stat">
-                    <span class="stat-value">$7.5k</span>
+                    <span class="stat-value" id="heroPolyPnl">&mdash;</span>
                     <span class="stat-label">Polymarket P&L</span>
                 </div>
                 <div class="stat">
@@ -285,13 +285,9 @@
                         <a href="https://polymarket.com/profile/0xc42e3Ad86BD9233631b5d494D29eA8aCaa25EdBd" target="_blank" rel="noopener" class="polymarket-link">View Profile &nearr;</a>
                     </div>
                     <div class="polymarket-stats-row">
-                        <div class="polymarket-stat">
-                            <span class="polymarket-value">+$7,500</span>
-                            <span class="polymarket-label">Total P&L</span>
-                        </div>
-                        <div class="polymarket-stat" id="polyOpenPnl" style="display:none">
-                            <span class="polymarket-value" id="polyOpenPnlValue">&mdash;</span>
-                            <span class="polymarket-label">Open P&L</span>
+                        <div class="polymarket-stat" id="polyLifetimePnl">
+                            <span class="polymarket-value" id="polyLifetimePnlValue">&mdash;</span>
+                            <span class="polymarket-label">Lifetime P&L</span>
                         </div>
                     </div>
                     <div class="polymarket-positions" id="polyPositions"></div>
@@ -308,7 +304,10 @@
                 <h2>Projects</h2>
             </div>
             <div class="project-card">
-                <div class="project-status">In Development</div>
+                <div class="project-card-header">
+                    <div class="project-status">In Development</div>
+                    <a href="https://github.com/jonaswaller/leo-collab" target="_blank" rel="noopener" class="project-github-link">GitHub &nearr;</a>
+                </div>
                 <h3>Polymarket Sports Bot</h3>
                 <p>Building an automated trading bot targeting +EV opportunities on Polymarket sports markets. The system integrates sportsbook odds APIs to identify mispriced prediction market contracts, executing both market-making and market-taking strategies.</p>
                 <div class="project-tech">
