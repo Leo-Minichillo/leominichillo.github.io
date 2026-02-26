@@ -264,9 +264,15 @@
         }
 
         function render(data) {
-            // Lifetime P&L = open cashPnl + closed cashPnl
+            // Lifetime P&L = unrealized on open + realized on closed
             var lifetimePnl = 0;
-            (data.open || []).forEach(function (p) { lifetimePnl += (p.cashPnl || 0); });
+            // Open: compute unrealized from current vs avg price to avoid double-counting
+            (data.open || []).forEach(function (p) {
+                var size = p.size || 0;
+                var cur = p.curPrice || 0;
+                var avg = p.avgPrice || 0;
+                lifetimePnl += size * (cur - avg);
+            });
             (data.closed || []).forEach(function (p) { lifetimePnl += (p.realizedPnl || 0); });
             updatePnl(lifetimePnl);
             renderPositions(data.open || []);
