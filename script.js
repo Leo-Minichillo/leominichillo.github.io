@@ -190,8 +190,9 @@
     // ---- Polymarket Live Positions ----
     (function setupPolymarket() {
         var WALLET = '0xc42e3Ad86BD9233631b5d494D29eA8aCaa25EdBd';
-        var CACHE_KEY = 'poly_positions';
+        var CACHE_KEY = 'poly_data';
         var CACHE_TTL = 60 * 60 * 1000;
+        var BASE = 'https://data-api.polymarket.com';
         var posEl = document.getElementById('polyPositions');
         var lifetimePnlEl = document.getElementById('polyLifetimePnlValue');
         var heroPnlEl = document.getElementById('heroPolyPnl');
@@ -225,21 +226,18 @@
             return '$' + abs.toFixed(0);
         }
 
-        function render(data) {
-            // Lifetime P&L = sum of cashPnl across all positions
-            var lifetimePnl = 0;
-            data.forEach(function (p) { lifetimePnl += (p.cashPnl || 0); });
-
+        function updatePnl(val) {
             if (lifetimePnlEl) {
-                lifetimePnlEl.textContent = fmtUSD(lifetimePnl);
-                lifetimePnlEl.className = 'polymarket-value ' + (lifetimePnl >= 0 ? 'positive' : 'negative');
+                lifetimePnlEl.textContent = fmtUSD(val);
+                lifetimePnlEl.className = 'polymarket-value ' + (val >= 0 ? 'positive' : 'negative');
             }
             if (heroPnlEl) {
-                heroPnlEl.textContent = fmtHeroPnl(lifetimePnl);
+                heroPnlEl.textContent = fmtHeroPnl(val);
             }
+        }
 
-            // Top 3 positions by current value (data is already sorted)
-            var top3 = data.filter(function (p) { return (p.currentValue || 0) > 0; }).slice(0, 3);
+        function renderPositions(openPositions) {
+            var top3 = openPositions.filter(function (p) { return (p.currentValue || 0) > 0; }).slice(0, 3);
             if (top3.length === 0) { posEl.innerHTML = ''; return; }
 
             var html = '';
@@ -265,37 +263,47 @@
             posEl.innerHTML = html;
         }
 
+        function render(data) {
+            // Lifetime P&L = open cashPnl + closed cashPnl
+            var lifetimePnl = 0;
+            (data.open || []).forEach(function (p) { lifetimePnl += (p.cashPnl || 0); });
+            (data.closed || []).forEach(function (p) { lifetimePnl += (p.cashPnl || 0); });
+            updatePnl(lifetimePnl);
+            renderPositions(data.open || []);
+        }
+
         function fallback() {
-            if (lifetimePnlEl) {
-                lifetimePnlEl.textContent = '+$7,500';
-                lifetimePnlEl.className = 'polymarket-value positive';
-            }
-            if (heroPnlEl) heroPnlEl.textContent = '$7.5k';
+            updatePnl(7500);
             posEl.innerHTML = '';
         }
 
-        function fetchPositions() {
+        function fetchData() {
             var cached = getCached(CACHE_KEY);
             if (cached) { render(cached); return; }
 
             posEl.innerHTML = '<span class="poly-loading">Loading positions\u2026</span>';
-            fetch('https://data-api.polymarket.com/positions?user=' + WALLET +
-                  '&sortBy=CURRENT&sortDirection=DESC&limit=50&sizeThreshold=0')
-                .then(function (r) { return r.json(); })
-                .then(function (data) {
-                    if (Array.isArray(data) && data.length > 0) {
-                        setCache(CACHE_KEY, data);
-                        render(data);
-                    } else {
-                        fallback();
-                    }
-                })
-                .catch(function () {
-                    fallback();
-                });
+
+            var openUrl = BASE + '/positions?user=' + WALLET + '&sortBy=CURRENT&sortDirection=DESC&limit=50&sizeThreshold=0';
+            var closedUrl = BASE + '/closed-positions?user=' + WALLET;
+
+            Promise.all([
+                fetch(openUrl).then(function (r) { return r.json(); }),
+                fetch(closedUrl).then(function (r) { return r.json(); })
+            ])
+            .then(function (results) {
+                var open = Array.isArray(results[0]) ? results[0] : [];
+                var closed = Array.isArray(results[1]) ? results[1] : [];
+                if (open.length === 0 && closed.length === 0) { fallback(); return; }
+                var data = { open: open, closed: closed };
+                setCache(CACHE_KEY, data);
+                render(data);
+            })
+            .catch(function () {
+                fallback();
+            });
         }
 
-        fetchPositions();
+        fetchData();
     })();
 
     // ---- Navbar scroll effect ----
