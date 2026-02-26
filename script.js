@@ -283,7 +283,7 @@
 
             posEl.innerHTML = '<span class="poly-loading">Loading positions\u2026</span>';
 
-            var openUrl = BASE + '/positions?user=' + WALLET + '&sortBy=CURRENT&sortDirection=DESC&limit=50&sizeThreshold=0';
+            var openUrl = BASE + '/positions?user=' + WALLET + '&sortBy=CURRENT&sortDirection=DESC&limit=50&sizeThreshold=1';
             var closedUrl = BASE + '/closed-positions?user=' + WALLET;
 
             Promise.all([
