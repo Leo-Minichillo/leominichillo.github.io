@@ -187,6 +187,102 @@
         fetchStocks();
     })();
 
+    // ---- Polymarket Live Positions ----
+    (function setupPolymarket() {
+        var WALLET = '0xc42e3Ad86BD9233631b5d494D29eA8aCaa25EdBd';
+        var CACHE_KEY = 'poly_positions';
+        var CACHE_TTL = 60 * 60 * 1000;
+        var posEl = document.getElementById('polyPositions');
+        var openPnlEl = document.getElementById('polyOpenPnl');
+        var openPnlValEl = document.getElementById('polyOpenPnlValue');
+        if (!posEl) return;
+
+        function getCached(key) {
+            try {
+                var raw = localStorage.getItem(key);
+                if (!raw) return null;
+                var cached = JSON.parse(raw);
+                if (Date.now() - cached.ts < CACHE_TTL) return cached.data;
+            } catch (e) {}
+            return null;
+        }
+
+        function setCache(key, data) {
+            try { localStorage.setItem(key, JSON.stringify({ ts: Date.now(), data: data })); } catch (e) {}
+        }
+
+        function fmtUSD(val) {
+            var abs = Math.abs(val);
+            var str = abs >= 1000
+                ? '$' + abs.toLocaleString(undefined, { maximumFractionDigits: 0 })
+                : '$' + abs.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            return (val >= 0 ? '+' : '-') + str;
+        }
+
+        function renderPositions(data) {
+            var top3 = data.slice(0, 3);
+
+            // Sum open P&L across all fetched positions
+            var totalOpenPnl = 0;
+            data.forEach(function (p) { totalOpenPnl += (p.cashPnl || 0); });
+            if (openPnlEl && openPnlValEl) {
+                openPnlValEl.textContent = fmtUSD(totalOpenPnl);
+                openPnlValEl.className = 'polymarket-value ' + (totalOpenPnl >= 0 ? 'positive' : 'negative');
+                openPnlEl.style.display = '';
+            }
+
+            if (top3.length === 0) {
+                posEl.innerHTML = '';
+                return;
+            }
+
+            var html = '';
+            top3.forEach(function (pos) {
+                var outcome = (pos.outcome || '').toLowerCase();
+                var isYes = outcome === 'yes';
+                var outcomeClass = isYes ? 'yes' : 'no';
+                var outcomeLabel = isYes ? 'YES' : 'NO';
+                var title = pos.title || 'Unknown market';
+                var curVal = pos.currentValue || 0;
+                var pnl = pos.cashPnl || 0;
+                var pnlClass = pnl >= 0 ? 'positive' : 'negative';
+                var slug = pos.slug || pos.eventSlug || '';
+                var href = slug ? 'https://polymarket.com/event/' + slug : 'https://polymarket.com/profile/' + WALLET;
+
+                html += '<a href="' + href + '" target="_blank" rel="noopener" class="poly-pos">';
+                html += '<span class="poly-pos-outcome ' + outcomeClass + '">' + outcomeLabel + '</span>';
+                html += '<span class="poly-pos-title">' + title + '</span>';
+                html += '<span class="poly-pos-value">$' + curVal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + '</span>';
+                html += '<span class="poly-pos-pnl ' + pnlClass + '">' + fmtUSD(pnl) + '</span>';
+                html += '</a>';
+            });
+            posEl.innerHTML = html;
+        }
+
+        function fetchPositions() {
+            var cached = getCached(CACHE_KEY);
+            if (cached) { renderPositions(cached); return; }
+
+            posEl.innerHTML = '<span class="poly-loading">Loading positions\u2026</span>';
+            fetch('https://data-api.polymarket.com/positions?user=' + WALLET +
+                  '&sortBy=CURRENT&sortDirection=DESC&limit=10&sizeThreshold=0.01')
+                .then(function (r) { return r.json(); })
+                .then(function (data) {
+                    if (Array.isArray(data) && data.length > 0) {
+                        setCache(CACHE_KEY, data);
+                        renderPositions(data);
+                    } else {
+                        posEl.innerHTML = '';
+                    }
+                })
+                .catch(function () {
+                    posEl.innerHTML = '';
+                });
+        }
+
+        fetchPositions();
+    })();
+
     // ---- Navbar scroll effect ----
     const navbar = document.getElementById('navbar');
     let lastScroll = 0;

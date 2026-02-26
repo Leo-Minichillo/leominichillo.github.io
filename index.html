@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Leo Minichillo</title>
     <link rel="icon" href="favicon.ico">
-    <link rel="stylesheet" href="style.css?v=5">
+    <link rel="stylesheet" href="style.css?v=6">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -284,10 +284,17 @@
                         <h3>Polymarket</h3>
                         <a href="https://polymarket.com/profile/0xc42e3Ad86BD9233631b5d494D29eA8aCaa25EdBd" target="_blank" rel="noopener" class="polymarket-link">View Profile &nearr;</a>
                     </div>
-                    <div class="polymarket-stat">
-                        <span class="polymarket-value">+$7,500</span>
-                        <span class="polymarket-label">Prediction Market P&L</span>
+                    <div class="polymarket-stats-row">
+                        <div class="polymarket-stat">
+                            <span class="polymarket-value">+$7,500</span>
+                            <span class="polymarket-label">Total P&L</span>
+                        </div>
+                        <div class="polymarket-stat" id="polyOpenPnl" style="display:none">
+                            <span class="polymarket-value" id="polyOpenPnlValue">&mdash;</span>
+                            <span class="polymarket-label">Open P&L</span>
+                        </div>
                     </div>
+                    <div class="polymarket-positions" id="polyPositions"></div>
                 </div>
             </div>
         </div>
@@ -458,6 +465,6 @@
         </div>
     </footer>
 
-    <script src="script.js?v=5"></script>
+    <script src="script.js?v=6"></script>
 </body>
 </html>
