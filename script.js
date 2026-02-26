@@ -265,16 +265,20 @@
 
         function render(data) {
             // Lifetime P&L = unrealized on open + realized on closed
-            var lifetimePnl = 0;
+            var openPnl = 0;
+            var closedPnl = 0;
             // Open: compute unrealized from current vs avg price to avoid double-counting
             (data.open || []).forEach(function (p) {
                 var size = p.size || 0;
                 var cur = p.curPrice || 0;
                 var avg = p.avgPrice || 0;
-                lifetimePnl += size * (cur - avg);
+                openPnl += size * (cur - avg);
             });
-            (data.closed || []).forEach(function (p) { lifetimePnl += (p.realizedPnl || 0); });
-            updatePnl(lifetimePnl);
+            (data.closed || []).forEach(function (p) { closedPnl += (p.realizedPnl || 0); });
+            console.log('[Poly Debug] Open positions:', (data.open || []).length, '| Open P&L:', openPnl.toFixed(2));
+            console.log('[Poly Debug] Closed positions:', (data.closed || []).length, '| Closed P&L:', closedPnl.toFixed(2));
+            console.log('[Poly Debug] Total:', (openPnl + closedPnl).toFixed(2));
+            updatePnl(openPnl + closedPnl);
             renderPositions(data.open || []);
         }
 
