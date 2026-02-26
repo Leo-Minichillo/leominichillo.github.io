@@ -290,7 +290,7 @@
         // Fetch all pages from closed-positions endpoint
         function fetchAllClosed(wallet) {
             var all = [];
-            var limit = 100;
+            var limit = 50;
             function fetchPage(offset) {
                 var url = BASE + '/closed-positions?user=' + wallet + '&limit=' + limit + '&offset=' + offset;
                 return fetch(url).then(function (r) { return r.json(); }).then(function (page) {
