@@ -16,6 +16,7 @@
             { symbol: 'ETH', name: 'Ethereum', price: null, change: null, type: 'crypto', id: 'ethereum' },
             { symbol: 'SOL', name: 'Solana', price: null, change: null, type: 'crypto', id: 'solana' },
             { symbol: 'HBAR', name: 'Hedera', price: null, change: null, type: 'crypto', id: 'hedera-hashgraph' },
+            { symbol: 'DOVU', name: 'Dovu', price: null, change: null, type: 'crypto', id: 'dovu' },
             { symbol: 'GOOGL', name: 'Google', price: null, change: null, type: 'stock' },
             { symbol: 'TSM', name: 'TSMC', price: null, change: null, type: 'stock' },
             { symbol: 'CAVA', name: 'Cava', price: null, change: null, type: 'stock' }
@@ -27,6 +28,7 @@
             'ETH':   { price: 2700,  change: -0.5 },
             'SOL':   { price: 170,   change: 2.3 },
             'HBAR':  { price: 0.22,  change: 3.1 },
+            'DOVU':  { price: 0.001, change: 1.0 },
             'GOOGL': { price: 182,   change: 0.8 },
             'TSM':   { price: 205,   change: 1.1 },
             'CAVA':  { price: 110,   change: -1.4 }
@@ -267,16 +269,22 @@
             // Lifetime P&L = unrealized on open + realized on closed
             var openPnl = 0;
             var closedPnl = 0;
-            // Open: compute unrealized from current vs avg price to avoid double-counting
+            var noOpenSkipped = 0;
+            var noClosedSkipped = 0;
+            // Open: compute unrealized; skip NO positions (already represented as YES on other outcomes)
             (data.open || []).forEach(function (p) {
+                if ((p.outcome || '').toLowerCase() === 'no') { noOpenSkipped++; return; }
                 var size = p.size || 0;
                 var cur = p.curPrice || 0;
                 var avg = p.avgPrice || 0;
                 openPnl += size * (cur - avg);
             });
-            (data.closed || []).forEach(function (p) { closedPnl += (p.realizedPnl || 0); });
-            console.log('[Poly Debug] Open positions:', (data.open || []).length, '| Open P&L:', openPnl.toFixed(2));
-            console.log('[Poly Debug] Closed positions:', (data.closed || []).length, '| Closed P&L:', closedPnl.toFixed(2));
+            (data.closed || []).forEach(function (p) {
+                if ((p.outcome || '').toLowerCase() === 'no') { noClosedSkipped++; return; }
+                closedPnl += (p.realizedPnl || 0);
+            });
+            console.log('[Poly Debug] Open positions:', (data.open || []).length, '(skipped', noOpenSkipped, 'NO) | Open P&L:', openPnl.toFixed(2));
+            console.log('[Poly Debug] Closed positions:', (data.closed || []).length, '(skipped', noClosedSkipped, 'NO) | Closed P&L:', closedPnl.toFixed(2));
             console.log('[Poly Debug] Total:', (openPnl + closedPnl).toFixed(2));
             updatePnl(openPnl + closedPnl);
             renderPositions(data.open || []);
