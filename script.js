@@ -271,17 +271,16 @@
             var closedPnl = 0;
             var noOpenSkipped = 0;
             var noClosedSkipped = 0;
-            // Open: compute unrealized; skip NO in negativeRisk (multi-outcome) markets
-            // — those are already represented as YES on other outcomes
+            // Open: compute unrealized; skip NO positions (already counted as YES on other outcomes)
             (data.open || []).forEach(function (p) {
-                if (p.negativeRisk && (p.outcome || '').toLowerCase() === 'no') { noOpenSkipped++; return; }
+                if ((p.outcome || '').toLowerCase() === 'no') { noOpenSkipped++; return; }
                 var size = p.size || 0;
                 var cur = p.curPrice || 0;
                 var avg = p.avgPrice || 0;
                 openPnl += size * (cur - avg);
             });
             (data.closed || []).forEach(function (p) {
-                if (p.negativeRisk && (p.outcome || '').toLowerCase() === 'no') { noClosedSkipped++; return; }
+                if ((p.outcome || '').toLowerCase() === 'no') { noClosedSkipped++; return; }
                 closedPnl += (p.realizedPnl || 0);
             });
             console.log('[Poly Debug] Open positions:', (data.open || []).length, '(skipped', noOpenSkipped, 'NO) | Open P&L:', openPnl.toFixed(2));
