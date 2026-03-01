@@ -30,6 +30,7 @@
 html {
     scroll-behavior: smooth;
     scroll-padding-top: 112px;
+    overflow-x: hidden;
 }
 
 body {
@@ -40,6 +41,7 @@ body {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     overflow-x: hidden;
+    -webkit-text-size-adjust: 100%;
 }
 
 a {
@@ -202,9 +204,13 @@ a {
     background: none;
     border: none;
     cursor: pointer;
-    padding: 8px;
+    padding: 10px;
     flex-direction: column;
     gap: 5px;
+    min-width: 44px;
+    min-height: 44px;
+    align-items: center;
+    justify-content: center;
 }
 
 .nav-toggle span {
@@ -228,6 +234,10 @@ a {
     font-weight: 500;
     color: var(--text-muted);
     transition: color 0.2s;
+    padding: 8px 0;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
 }
 
 .mobile-menu a:hover {
@@ -670,6 +680,8 @@ section {
     font-size: 0.9rem;
     line-height: 1.7;
     margin-top: 12px;
+    overflow-wrap: break-word;
+    word-break: break-word;
 }
 
 .career-education {
@@ -1624,6 +1636,8 @@ footer {
 
     #hero {
         padding-top: 120px;
+        min-height: auto;
+        padding-bottom: 60px;
     }
 
     .nav-links {
@@ -1646,13 +1660,28 @@ footer {
         font-size: 1.2rem;
     }
 
+    .hero-subtitle {
+        font-size: 1.05rem;
+    }
+
     .about-grid {
         grid-template-columns: 1fr;
         gap: 48px;
     }
 
+    .about-intro {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+
     .about-interests {
         position: static;
+    }
+
+    .results-total {
+        flex-direction: column;
+        gap: 8px;
     }
 
     .results-total-value {
@@ -1666,10 +1695,25 @@ footer {
     .polymarket-card {
         flex-direction: column;
         align-items: flex-start;
+        padding: 20px 20px;
+    }
+
+    .polymarket-value {
+        font-size: 1.6rem;
     }
 
     .polymarket-stat {
         text-align: left;
+    }
+
+    .poly-pos {
+        font-size: 0.78rem;
+        padding: 8px 10px;
+        gap: 8px;
+    }
+
+    .poly-pos-title {
+        font-size: 0.75rem;
     }
 
     .project-card {
@@ -1695,11 +1739,33 @@ footer {
     .career-card-content {
         padding: 24px;
     }
+
+    .footer-content {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .footer-links {
+        justify-content: center;
+    }
+
+    .trend-line-wrapper {
+        height: 50%;
+    }
 }
 
 @media (max-width: 480px) {
+    .container {
+        padding: 0 16px;
+    }
+
     .hero-content h1 {
         font-size: 2.5rem;
+    }
+
+    .hero-tag {
+        font-size: 0.65rem;
+        padding: 6px 12px;
     }
 
     .hero-stats {
@@ -1713,6 +1779,98 @@ footer {
 
     .btn {
         justify-content: center;
+        min-height: 44px;
+    }
+
+    .results-total-value {
+        font-size: 1.8rem;
+    }
+
+    .polymarket-card {
+        padding: 16px;
+    }
+
+    .polymarket-header {
+        flex-wrap: wrap;
+    }
+
+    .project-card {
+        padding: 20px;
+    }
+
+    .project-card h3 {
+        font-size: 1.25rem;
+    }
+
+    .career-card-content {
+        padding: 20px;
+    }
+
+    .career-card h3 {
+        font-size: 1.1rem;
+    }
+
+    .game-stats-row {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 16px;
+    }
+
+    .game-stat-block:nth-child(4),
+    .game-stat-block:nth-child(5) {
+        grid-column: span 1;
+    }
+
+    .game-bankroll-value {
+        font-size: 1.4rem;
+    }
+
+    .game-stat-value {
+        font-size: 0.95rem;
+    }
+
+    .game-card {
+        padding: 16px;
+    }
+
+    .game-team {
+        padding: 16px 12px;
+    }
+
+    .game-team-name {
+        font-size: 0.9rem;
+    }
+
+    .game-team-spread {
+        font-size: 1.2rem;
+    }
+
+    .footer-links {
+        gap: 16px;
+        flex-wrap: wrap;
+    }
+}
+
+@media (max-width: 360px) {
+    .hero-content h1 {
+        font-size: 2rem;
+    }
+
+    .hero-tag {
+        font-size: 0.6rem;
+    }
+
+    .stat-value {
+        font-size: 1rem;
+    }
+
+    .results-total-value {
+        font-size: 1.5rem;
+    }
+
+    .wager-preset {
+        padding: 6px 8px;
+        font-size: 0.65rem;
     }
 }
 
