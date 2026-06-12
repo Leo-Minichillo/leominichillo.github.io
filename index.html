@@ -10,13 +10,16 @@
     <meta property="og:url" content="https://leominichillo.com/">
     <meta property="og:title" content="Leo Minichillo — Sports Betting & Prediction Markets Trader">
     <meta property="og:description" content="Sports trader at Fanatics Betting & Gaming. Obsessed with +EV betting and prediction markets — every result tracked and published.">
-    <meta property="og:image" content="https://leominichillo.com/leo.jpg">
-    <meta name="twitter:card" content="summary">
+    <meta property="og:image" content="https://leominichillo.com/og-card.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="Leo Minichillo — +EV sports betting and prediction markets, $39k+ tracked P&L">
+    <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Leo Minichillo — Sports Betting & Prediction Markets Trader">
     <meta name="twitter:description" content="Sports trader at Fanatics Betting & Gaming. Obsessed with +EV betting and prediction markets — every result tracked and published.">
-    <meta name="twitter:image" content="https://leominichillo.com/leo.jpg">
+    <meta name="twitter:image" content="https://leominichillo.com/og-card.png">
     <link rel="icon" href="favicon.ico">
-    <link rel="stylesheet" href="style.css?v=8">
+    <link rel="stylesheet" href="style.css?v=9">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&family=Fraunces:opsz,wght@9..144,400..700&display=swap" rel="stylesheet">
@@ -321,6 +324,22 @@
                             <span class="polymarket-value" id="polyLifetimePnlValue">&mdash;</span>
                             <span class="polymarket-label">Lifetime P&L</span>
                         </div>
+                        <div class="polymarket-stat" id="polyWinRateStat" hidden>
+                            <span class="polymarket-value neutral" id="polyWinRateValue">&mdash;</span>
+                            <span class="polymarket-label">Closed Win Rate</span>
+                        </div>
+                        <div class="polymarket-stat" id="polyVolumeStat" hidden>
+                            <span class="polymarket-value neutral" id="polyVolumeValue">&mdash;</span>
+                            <span class="polymarket-label">Volume Traded</span>
+                        </div>
+                        <div class="polymarket-stat" id="polyMarketsStat" hidden>
+                            <span class="polymarket-value neutral" id="polyMarketsValue">&mdash;</span>
+                            <span class="polymarket-label">Markets Traded</span>
+                        </div>
+                        <div class="polymarket-stat" id="polyBiggestWinStat" hidden>
+                            <span class="polymarket-value" id="polyBiggestWinValue">&mdash;</span>
+                            <span class="polymarket-label">Biggest Win</span>
+                        </div>
                     </div>
                     <div class="polymarket-positions" id="polyPositions"></div>
                 </div>
@@ -542,6 +561,7 @@
         </div>
     </footer>
 
-    <script src="script.js?v=9"></script>
+    <script src="script.js?v=10"></script>
+    <script data-goatcounter="https://leominichillo.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 </body>
 </html>
