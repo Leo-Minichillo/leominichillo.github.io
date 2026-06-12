@@ -179,6 +179,7 @@
         }
 
         function fmtCompactUSD(val) {
+            if (val >= 1000000) return '$' + (val / 1000000).toFixed(1) + 'M';
             if (val >= 100000) return '$' + Math.round(val / 1000) + 'k';
             if (val >= 10000) return '$' + (val / 1000).toFixed(1) + 'k';
             return '$' + Math.round(val).toLocaleString();
@@ -217,23 +218,35 @@
                 showStat('polyBiggestWinStat', 'polyBiggestWinValue', '+' + fmtCompactUSD(biggestWin));
             }
 
-            var volume = 0;
             var markets = {};
             open.concat(closed).forEach(function (p) {
-                var cost = (typeof p.initialValue === 'number' && p.initialValue > 0)
-                    ? p.initialValue
-                    : (p.size || 0) * (p.avgPrice || 0);
-                volume += cost;
                 var key = p.conditionId || p.title;
                 if (key) markets[key] = true;
             });
-            if (volume > 0) {
-                showStat('polyVolumeStat', 'polyVolumeValue', fmtCompactUSD(volume));
-            }
             var marketCount = Object.keys(markets).length;
             if (marketCount > 0) {
                 showStat('polyMarketsStat', 'polyMarketsValue', String(marketCount));
             }
+        }
+
+        // Volume traded comes from the leaderboard API — the same source
+        // the Polymarket profile page uses, so the numbers match exactly
+        function fetchVolume() {
+            var cached = getCached('poly_volume');
+            if (typeof cached === 'number') {
+                showStat('polyVolumeStat', 'polyVolumeValue', fmtCompactUSD(cached));
+                return;
+            }
+            fetch('https://lb-api.polymarket.com/volume?window=all&limit=1&address=' + WALLET)
+                .then(function (r) { return r.json(); })
+                .then(function (data) {
+                    var amount = Array.isArray(data) && data[0] && data[0].amount;
+                    if (typeof amount === 'number' && amount > 0) {
+                        setCache('poly_volume', amount);
+                        showStat('polyVolumeStat', 'polyVolumeValue', fmtCompactUSD(amount));
+                    }
+                })
+                .catch(function () { /* stat stays hidden */ });
         }
 
         function render(data) {
@@ -308,6 +321,7 @@
         }
 
         fetchData();
+        fetchVolume();
     })();
 
     // ---- Navbar scroll effect ----
