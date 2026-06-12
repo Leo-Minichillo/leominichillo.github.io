@@ -5,97 +5,15 @@
 (function () {
     'use strict';
 
-    // ---- Ticker Bar (Live Asset Prices) ----
+    // ---- Ticker Bar (Live Polymarket Prices) ----
     (function setupTicker() {
         var tickerTrack = document.getElementById('tickerTrack');
         var tickerBar = document.getElementById('tickerBar');
         if (!tickerTrack || !tickerBar) return;
 
-        var tickerAssets = [
-            { symbol: 'BTC', name: 'Bitcoin', price: null, change: null, type: 'crypto', id: 'bitcoin' },
-            { symbol: 'ETH', name: 'Ethereum', price: null, change: null, type: 'crypto', id: 'ethereum' },
-            { symbol: 'SOL', name: 'Solana', price: null, change: null, type: 'crypto', id: 'solana' },
-            { symbol: 'HBAR', name: 'Hedera', price: null, change: null, type: 'crypto', id: 'hedera-hashgraph' },
-            { symbol: 'DOVU', name: 'Dovu', price: null, change: null, type: 'crypto', id: 'dovu-2' },
-            { symbol: 'GOOGL', name: 'Google', price: null, change: null, type: 'stock' },
-            { symbol: 'TSM', name: 'TSMC', price: null, change: null, type: 'stock' },
-            { symbol: 'CAVA', name: 'Cava', price: null, change: null, type: 'stock' }
-        ];
-
-        // Fallback values if APIs fail
-        var fallbackData = {
-            'BTC':   { price: 96000, change: 1.2 },
-            'ETH':   { price: 2700,  change: -0.5 },
-            'SOL':   { price: 170,   change: 2.3 },
-            'HBAR':  { price: 0.22,  change: 3.1 },
-            'DOVU':  { price: 0.004, change: 1.0 },
-            'GOOGL': { price: 182,   change: 0.8 },
-            'TSM':   { price: 205,   change: 1.1 },
-            'CAVA':  { price: 110,   change: -1.4 }
-        };
-
-        function formatPrice(price) {
-            if (price === null) return '--';
-            if (price >= 1000) return '$' + price.toLocaleString(undefined, { maximumFractionDigits: 0 });
-            if (price >= 1) return '$' + price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-            return '$' + price.toFixed(4);
-        }
-
-        function formatChange(change) {
-            if (change === null || change === undefined) return '';
-            var sign = change >= 0 ? '+' : '';
-            return sign + change.toFixed(2) + '%';
-        }
-
-        // Generate a deterministic mini sparkline from price
-        function generateSparkline(seed, isPositive) {
-            var points = [];
-            var s = Math.abs(seed || 1);
-            for (var i = 0; i < 7; i++) {
-                s = (s * 9301 + 49297) % 233280;
-                points.push(1 + (s / 233280) * 8);
-            }
-            if (isPositive) {
-                points[points.length - 1] = Math.min(points[points.length - 1] + 2, 10);
-                points[0] = Math.max(points[0] - 2, 1);
-            } else {
-                points[0] = Math.min(points[0] + 2, 10);
-                points[points.length - 1] = Math.max(points[points.length - 1] - 2, 1);
-            }
-            var step = 36 / (points.length - 1);
-            var coords = points.map(function (y, i) { return Math.round(i * step) + ',' + y.toFixed(1); }).join(' ');
-            var color = isPositive ? '#10b981' : '#ef4444';
-            return '<svg class="ticker-spark" viewBox="0 0 36 12"><polyline points="' + coords + '" fill="none" stroke="' + color + '" stroke-width="1.2" stroke-linecap="round"/></svg>';
-        }
-
-        function renderTicker() {
-            var html = '';
-            for (var i = 0; i < tickerAssets.length; i++) {
-                var a = tickerAssets[i];
-                var fb = fallbackData[a.symbol];
-                var price = a.price !== null ? a.price : (fb ? fb.price : null);
-                var change = a.change !== null ? a.change : (fb ? fb.change : null);
-                var isPositive = change !== null ? change >= 0 : true;
-                var changeClass = isPositive ? 'positive' : 'negative';
-
-                html += '<span class="ticker-item">';
-                html += '<span class="ticker-symbol">' + a.symbol + '</span>';
-                html += '<span class="ticker-price">' + formatPrice(price) + '</span>';
-                if (change !== null) {
-                    html += '<span class="ticker-change ' + changeClass + '">' + formatChange(change) + '</span>';
-                }
-                html += generateSparkline(price, isPositive);
-                html += '</span>';
-                if (i < tickerAssets.length - 1) {
-                    html += '<span class="ticker-sep">\u00b7</span>';
-                }
-            }
-            // Duplicate for seamless loop
-            tickerTrack.innerHTML = html + '<span class="ticker-sep">\u00b7</span>' + html;
-        }
-
-        // ---- Cache helpers (max 1 API call per hour per source) ----
-        var CACHE_TTL = 60 * 60 * 1000; // 1 hour in ms
+        var CACHE_KEY = 'ticker_polymarkets';
+        var CACHE_TTL = 10 * 60 * 1000; // 10 minutes
+        var GAMMA_URL = 'https://gamma-api.polymarket.com/markets?limit=14&active=true&closed=false&order=volume24hr&ascending=false';
 
         function getCached(key) {
             try {
@@ -111,82 +29,77 @@
             try { localStorage.setItem(key, JSON.stringify({ ts: Date.now(), data: data })); } catch (e) {}
         }
 
-        // Apply fetched/cached crypto data
-        function applyCryptoData(data) {
-            data.forEach(function (coin) {
-                var asset = tickerAssets.find(function (a) { return a.id === coin.id; });
-                if (!asset) return;
-                asset.price = coin.current_price;
-                asset.change = coin.price_change_percentage_24h || null;
-            });
-            renderTicker();
+        function hideTicker() {
+            tickerBar.style.display = 'none';
+            document.body.classList.add('no-ticker');
         }
 
-        function applyStockData(stockResults) {
-            stockResults.forEach(function (item) {
-                var asset = tickerAssets.find(function (a) { return a.symbol === item.symbol; });
-                if (asset) {
-                    asset.price = item.price;
-                    asset.change = item.change;
-                }
-            });
-            renderTicker();
+        function escapeHtml(str) {
+            return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
         }
 
-        // Initial render with fallbacks
-        renderTicker();
+        function truncate(str, n) {
+            return str.length > n ? str.slice(0, n - 1).replace(/\s+\S*$/, '') + '\u2026' : str;
+        }
 
-        // Fetch crypto from CoinGecko /coins/markets (24h change)
-        function fetchCrypto() {
-            var cached = getCached('ticker_crypto');
-            if (cached) { applyCryptoData(cached); return; }
-
-            var ids = tickerAssets.filter(function (a) { return a.type === 'crypto'; }).map(function (a) { return a.id; }).join(',');
-            fetch('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=' + ids)
-                .then(function (res) { return res.json(); })
-                .then(function (data) {
-                    if (Array.isArray(data) && data.length > 0) {
-                        setCache('ticker_crypto', data);
-                        applyCryptoData(data);
+        function renderTicker(markets) {
+            var html = '';
+            for (var i = 0; i < markets.length; i++) {
+                var m = markets[i];
+                var cents = Math.round(m.price * 100);
+                html += '<a class="ticker-item" href="' + escapeHtml(m.url) + '" target="_blank" rel="noopener">';
+                html += '<span class="ticker-symbol">' + escapeHtml(truncate(m.title, 44)) + '</span>';
+                html += '<span class="ticker-price">' + cents + '\u00a2</span>';
+                if (m.change !== null) {
+                    var deltaCents = Math.round(m.change * 100);
+                    if (deltaCents !== 0) {
+                        var changeClass = deltaCents > 0 ? 'positive' : 'negative';
+                        var arrow = deltaCents > 0 ? '\u25b2' : '\u25bc';
+                        html += '<span class="ticker-change ' + changeClass + '">' + arrow + Math.abs(deltaCents) + '\u00a2</span>';
                     }
-                })
-                .catch(function () { /* keep fallback values */ });
+                }
+                html += '</a>';
+                html += '<span class="ticker-sep">\u00b7</span>';
+            }
+            // Duplicate for seamless loop
+            tickerTrack.innerHTML = html + html;
         }
 
-        // Fetch stock prices from Finnhub (free tier, 24h change only)
-        var FINNHUB_API_KEY = 'd6fndhpr01qqnmbpau5gd6fndhpr01qqnmbpau60';
-
-        function fetchStocks() {
-            var cached = getCached('ticker_stocks');
-            if (cached) { applyStockData(cached); return; }
-
-            var stocks = tickerAssets.filter(function (a) { return a.type === 'stock'; });
-            var results = [];
-            var done = 0;
-
-            stocks.forEach(function (asset) {
-                fetch('https://finnhub.io/api/v1/quote?symbol=' + asset.symbol + '&token=' + FINNHUB_API_KEY)
-                    .then(function (res) { return res.json(); })
-                    .then(function (data) {
-                        if (data && data.c && data.c > 0) {
-                            results.push({ symbol: asset.symbol, price: data.c, change: data.dp });
-                        }
-                    })
-                    .catch(function () {})
-                    .finally(function () {
-                        done++;
-                        if (done === stocks.length) {
-                            if (results.length > 0) {
-                                setCache('ticker_stocks', results);
-                                applyStockData(results);
-                            }
-                        }
-                    });
+        function parseMarkets(data) {
+            var markets = [];
+            (Array.isArray(data) ? data : []).forEach(function (m) {
+                if (!m || !m.question) return;
+                var price = null;
+                try {
+                    var prices = JSON.parse(m.outcomePrices || '[]');
+                    price = parseFloat(prices[0]);
+                } catch (e) {}
+                if (price === null || isNaN(price) || price <= 0 || price >= 1) return;
+                var eventSlug = m.events && m.events[0] && m.events[0].slug;
+                var url = eventSlug
+                    ? 'https://polymarket.com/event/' + eventSlug
+                    : (m.slug ? 'https://polymarket.com/market/' + m.slug : 'https://polymarket.com');
+                var change = (typeof m.oneDayPriceChange === 'number') ? m.oneDayPriceChange : null;
+                markets.push({ title: m.question, price: price, change: change, url: url });
             });
+            return markets;
         }
 
-        fetchCrypto();
-        fetchStocks();
+        var cached = getCached(CACHE_KEY);
+        if (cached && cached.length > 0) {
+            renderTicker(cached);
+            return;
+        }
+
+        fetch(GAMMA_URL)
+            .then(function (res) { return res.json(); })
+            .then(function (data) {
+                var markets = parseMarkets(data);
+                if (markets.length === 0) { hideTicker(); return; }
+                setCache(CACHE_KEY, markets);
+                renderTicker(markets);
+            })
+            .catch(function () { hideTicker(); });
     })();
 
     // ---- Polymarket Live Positions ----
@@ -269,23 +182,18 @@
             // Lifetime P&L = unrealized on open + realized on closed
             var openPnl = 0;
             var closedPnl = 0;
-            var noOpenSkipped = 0;
-            var noClosedSkipped = 0;
             // Open: compute unrealized; skip NO positions (already counted as YES on other outcomes)
             (data.open || []).forEach(function (p) {
-                if ((p.outcome || '').toLowerCase() === 'no') { noOpenSkipped++; return; }
+                if ((p.outcome || '').toLowerCase() === 'no') return;
                 var size = p.size || 0;
                 var cur = p.curPrice || 0;
                 var avg = p.avgPrice || 0;
                 openPnl += size * (cur - avg);
             });
             (data.closed || []).forEach(function (p) {
-                if ((p.outcome || '').toLowerCase() === 'no') { noClosedSkipped++; return; }
+                if ((p.outcome || '').toLowerCase() === 'no') return;
                 closedPnl += (p.realizedPnl || 0);
             });
-            console.log('[Poly Debug] Open positions:', (data.open || []).length, '(skipped', noOpenSkipped, 'NO) | Open P&L:', openPnl.toFixed(2));
-            console.log('[Poly Debug] Closed positions:', (data.closed || []).length, '(skipped', noClosedSkipped, 'NO) | Closed P&L:', closedPnl.toFixed(2));
-            console.log('[Poly Debug] Total:', (openPnl + closedPnl).toFixed(2));
             updatePnl(openPnl + closedPnl);
             renderPositions(data.open || []);
         }
@@ -389,7 +297,7 @@
     var fadeTargets = document.querySelectorAll(
         '.section-header, .about-lead, .timeline-item, .about-interests, ' +
         '.career-card, .results-overview, .result-card, .polymarket-card, ' +
-        '.project-card, .game-wrapper'
+        '.edge-intro, .edge-card, .project-card, .game-wrapper'
     );
 
     fadeTargets.forEach(function (el) {
@@ -540,6 +448,72 @@
             explainerArrow.classList.toggle('open');
         });
     }
+
+    // ---- Edge Calculator ----
+    (function setupEdgeCalculator() {
+        var oddsInput = document.getElementById('edgeOdds');
+        var probSlider = document.getElementById('edgeProbSlider');
+        var probValueEl = document.getElementById('edgeProbValue');
+        var impliedEl = document.getElementById('edgeImplied');
+        var edgeEl = document.getElementById('edgeEdgeVal');
+        var evEl = document.getElementById('edgeEV');
+        var kellyEl = document.getElementById('edgeKelly');
+        var verdictEl = document.getElementById('edgeVerdict');
+        if (!oddsInput || !probSlider) return;
+
+        // American odds -> decimal odds, or null if invalid
+        function parseAmericanOdds(str) {
+            var cleaned = String(str).trim().replace(/\s/g, '');
+            if (!/^[+-]?\d+$/.test(cleaned)) return null;
+            var odds = parseInt(cleaned, 10);
+            if (Math.abs(odds) < 100) return null;
+            return odds > 0 ? 1 + odds / 100 : 1 + 100 / Math.abs(odds);
+        }
+
+        function setValue(el, text, sign) {
+            el.textContent = text;
+            el.className = 'edge-output-value' + (sign > 0 ? ' positive' : sign < 0 ? ' negative' : '');
+        }
+
+        function recalc() {
+            var p = parseFloat(probSlider.value) / 100;
+            probValueEl.textContent = (p * 100).toFixed(1) + '%';
+
+            var dec = parseAmericanOdds(oddsInput.value);
+            oddsInput.classList.toggle('invalid', dec === null);
+            if (dec === null) {
+                [impliedEl, edgeEl, evEl, kellyEl].forEach(function (el) { setValue(el, '—', 0); });
+                verdictEl.textContent = 'Enter valid American odds (e.g. -110 or +150)';
+                verdictEl.className = 'edge-verdict';
+                return;
+            }
+
+            var implied = 1 / dec;
+            var edgePts = (p - implied) * 100;            // percentage points vs implied
+            var evPer100 = 100 * (p * dec - 1);           // expected profit on a $100 stake
+            var kelly = (p * dec - 1) / (dec - 1);        // fraction of bankroll
+
+            setValue(impliedEl, (implied * 100).toFixed(1) + '%', 0);
+            setValue(edgeEl, (edgePts >= 0 ? '+' : '') + edgePts.toFixed(1) + 'pp', edgePts);
+            setValue(evEl, (evPer100 >= 0 ? '+$' : '-$') + Math.abs(evPer100).toFixed(2), evPer100);
+            setValue(kellyEl, kelly > 0 ? (kelly * 100).toFixed(1) + '%' : '0%', kelly > 0 ? 1 : 0);
+
+            if (evPer100 >= 1) {
+                verdictEl.textContent = 'BET — +' + (evPer100).toFixed(1) + '% ROI · ¼ Kelly: ' + (kelly * 25).toFixed(1) + '% of bankroll';
+                verdictEl.className = 'edge-verdict positive';
+            } else if (evPer100 > -1) {
+                verdictEl.textContent = 'MARGINAL — edge is within model noise. Pass unless you trust your number.';
+                verdictEl.className = 'edge-verdict marginal';
+            } else {
+                verdictEl.textContent = 'PASS — you’re paying the book ' + Math.abs(evPer100).toFixed(1) + '% to make this bet';
+                verdictEl.className = 'edge-verdict negative';
+            }
+        }
+
+        oddsInput.addEventListener('input', recalc);
+        probSlider.addEventListener('input', recalc);
+        recalc();
+    })();
 
     // ---- Beat the Spread Game ----
     // 2025-26 NFL team data: nfelo ratings + EPA per play (offense & defense)

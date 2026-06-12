@@ -3,16 +3,46 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Leo Minichillo</title>
+    <title>Leo Minichillo &mdash; Sports Betting &amp; Prediction Markets Trader</title>
+    <meta name="description" content="Leo Minichillo is a sports trader at Fanatics Betting & Gaming, obsessed with +EV sports betting and prediction markets. $39k+ in documented, tracked profit across sportsbooks and Polymarket.">
+    <link rel="canonical" href="https://leominichillo.com/">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://leominichillo.com/">
+    <meta property="og:title" content="Leo Minichillo — Sports Betting & Prediction Markets Trader">
+    <meta property="og:description" content="Sports trader at Fanatics Betting & Gaming. Obsessed with +EV betting and prediction markets — every result tracked and published.">
+    <meta property="og:image" content="https://leominichillo.com/leo.jpg">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Leo Minichillo — Sports Betting & Prediction Markets Trader">
+    <meta name="twitter:description" content="Sports trader at Fanatics Betting & Gaming. Obsessed with +EV betting and prediction markets — every result tracked and published.">
+    <meta name="twitter:image" content="https://leominichillo.com/leo.jpg">
     <link rel="icon" href="favicon.ico">
-    <link rel="stylesheet" href="style.css?v=7">
+    <link rel="stylesheet" href="style.css?v=8">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&family=Fraunces:opsz,wght@9..144,400..700&display=swap" rel="stylesheet">
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "Person",
+        "name": "Leo Minichillo",
+        "url": "https://leominichillo.com/",
+        "image": "https://leominichillo.com/leo.jpg",
+        "jobTitle": "Trader I, Fanatics Betting & Gaming",
+        "alumniOf": "University of Washington",
+        "knowsAbout": ["Sports Betting", "Prediction Markets", "Expected Value", "Quantitative Trading", "Sports Analytics", "Data Science"],
+        "sameAs": [
+            "https://www.linkedin.com/in/leo-minichillo/",
+            "https://github.com/Leo-Minichillo",
+            "https://x.com/leo_minichillo",
+            "https://polymarket.com/profile/0xc42e3Ad86BD9233631b5d494D29eA8aCaa25EdBd"
+        ]
+    }
+    </script>
 </head>
 <body>
-    <!-- Ticker Bar -->
+    <!-- Ticker Bar: live Polymarket prices -->
     <div class="ticker-bar" id="tickerBar">
+        <span class="ticker-label"><span class="ticker-live-dot"></span>LIVE &middot; POLYMARKET</span>
         <div class="ticker-track" id="tickerTrack"></div>
     </div>
 
@@ -24,6 +54,7 @@
                 <a href="#about">About</a>
                 <a href="#career">Career</a>
                 <a href="#results">Results</a>
+                <a href="#edge">Edge</a>
                 <a href="#projects">Projects</a>
                 <a href="#game">Game</a>
             </div>
@@ -37,6 +68,7 @@
             <a href="#about">About</a>
             <a href="#career">Career</a>
             <a href="#results">Results</a>
+            <a href="#edge">Edge</a>
             <a href="#projects">Projects</a>
             <a href="#game">Game</a>
         </div>
@@ -50,9 +82,9 @@
             <div class="glow glow-2"></div>
         </div>
         <div class="hero-content">
-            <div class="hero-tag">Data &bull; Sports Analytics &bull; Prediction Markets</div>
+            <div class="hero-tag">+EV Sports Betting &middot; Prediction Markets</div>
             <h1>Leo Minichillo</h1>
-            <p class="hero-subtitle">Trader at Fanatics Betting &amp; Gaming. Turning data into edge.</p>
+            <p class="hero-subtitle">Sports trader at Fanatics Betting &amp; Gaming. I model markets, spot mispriced lines, and bet them &mdash; every result tracked and published below.</p>
             <div class="hero-stats">
                 <div class="stat">
                     <span class="stat-value" data-target="31">$0k</span>
@@ -252,7 +284,7 @@
                     <div class="result-bar"><div class="result-bar-fill" style="--fill-width: 8%"></div></div>
                 </div>
                 <div class="result-card positive">
-                    <div class="result-book">Caesers</div>
+                    <div class="result-book">Caesars</div>
                     <div class="result-amount">+$293.32</div>
                     <div class="result-bar"><div class="result-bar-fill" style="--fill-width: 2%"></div></div>
                 </div>
@@ -296,11 +328,56 @@
         </div>
     </section>
 
+    <!-- Edge Calculator -->
+    <section id="edge">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag">04</span>
+                <h2>Edge Calculator</h2>
+            </div>
+            <p class="edge-intro">The only question that matters: <em>is the price wrong?</em> Enter the odds you're being offered and your estimate of the true win probability &mdash; the calculator does the rest.</p>
+            <div class="edge-card">
+                <div class="edge-inputs">
+                    <div class="edge-field">
+                        <label for="edgeOdds">American Odds Offered</label>
+                        <input type="text" id="edgeOdds" class="edge-odds-input" value="+120" inputmode="text" autocomplete="off" spellcheck="false">
+                    </div>
+                    <div class="edge-field">
+                        <label for="edgeProbSlider">Your True Win Probability</label>
+                        <div class="edge-prob-wrap">
+                            <input type="range" id="edgeProbSlider" min="1" max="99" step="0.5" value="50">
+                            <span class="edge-prob-value" id="edgeProbValue">50.0%</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="edge-outputs">
+                    <div class="edge-output">
+                        <span class="edge-output-value" id="edgeImplied">&mdash;</span>
+                        <span class="edge-output-label">Implied Probability</span>
+                    </div>
+                    <div class="edge-output">
+                        <span class="edge-output-value" id="edgeEdgeVal">&mdash;</span>
+                        <span class="edge-output-label">Your Edge</span>
+                    </div>
+                    <div class="edge-output">
+                        <span class="edge-output-value" id="edgeEV">&mdash;</span>
+                        <span class="edge-output-label">EV per $100</span>
+                    </div>
+                    <div class="edge-output">
+                        <span class="edge-output-value" id="edgeKelly">&mdash;</span>
+                        <span class="edge-output-label">Kelly Stake</span>
+                    </div>
+                </div>
+                <div class="edge-verdict" id="edgeVerdict"></div>
+            </div>
+        </div>
+    </section>
+
     <!-- Projects Section -->
     <section id="projects">
         <div class="container">
             <div class="section-header">
-                <span class="section-tag">04</span>
+                <span class="section-tag">05</span>
                 <h2>Projects</h2>
             </div>
             <div class="project-card">
@@ -333,7 +410,7 @@
                         </div>
                     </div>
                     <div class="feature">
-                        <div class="feature-icon">&target;</div>
+                        <div class="feature-icon">&#x25CE;</div>
                         <div>
                             <strong>Market Taking</strong>
                             <p>Aggressively takes mispriced contracts when edge exceeds threshold based on real-time odds movement.</p>
@@ -361,7 +438,7 @@
     <section id="game">
         <div class="container">
             <div class="section-header">
-                <span class="section-tag">05</span>
+                <span class="section-tag">06</span>
                 <h2>Beat the Spread</h2>
             </div>
             <p class="game-source">Spreads calculated from 2025-26 nfelo ratings + EPA per play</p>
@@ -455,6 +532,7 @@
             <div class="footer-content">
                 <span class="footer-name">Leo Minichillo</span>
                 <div class="footer-links">
+                    <a href="resume.pdf" target="_blank" rel="noopener">Resume</a>
                     <a href="https://polymarket.com/profile/0xc42e3Ad86BD9233631b5d494D29eA8aCaa25EdBd" target="_blank" rel="noopener">Polymarket</a>
                     <a href="https://www.linkedin.com/in/leo-minichillo/" target="_blank" rel="noopener">LinkedIn</a>
                     <a href="https://github.com/Leo-Minichillo" target="_blank" rel="noopener">GitHub</a>
@@ -464,6 +542,6 @@
         </div>
     </footer>
 
-    <script src="script.js?v=8"></script>
+    <script src="script.js?v=9"></script>
 </body>
 </html>
