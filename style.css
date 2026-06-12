@@ -887,6 +887,10 @@ section {
     color: var(--accent);
 }
 
+.polymarket-value.neutral {
+    color: var(--text);
+}
+
 .polymarket-label {
     font-size: 0.75rem;
     color: var(--text-dim);

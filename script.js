@@ -178,6 +178,64 @@
             posEl.innerHTML = html;
         }
 
+        function fmtCompactUSD(val) {
+            if (val >= 100000) return '$' + Math.round(val / 1000) + 'k';
+            if (val >= 10000) return '$' + (val / 1000).toFixed(1) + 'k';
+            return '$' + Math.round(val).toLocaleString();
+        }
+
+        function showStat(statId, valueId, text) {
+            var statEl = document.getElementById(statId);
+            var valueEl = document.getElementById(valueId);
+            if (!statEl || !valueEl) return;
+            valueEl.textContent = text;
+            statEl.hidden = false;
+        }
+
+        // Derived stats: win rate / biggest win on closed YES positions
+        // (NO mirrors YES, consistent with the P&L math); volume and
+        // market count over everything actually traded
+        function renderStats(data) {
+            var open = data.open || [];
+            var closed = data.closed || [];
+
+            var wins = 0, resolved = 0, biggestWin = 0;
+            closed.forEach(function (p) {
+                if ((p.outcome || '').toLowerCase() === 'no') return;
+                var pnl = p.realizedPnl;
+                if (typeof pnl !== 'number') return;
+                resolved++;
+                if (pnl > 0) {
+                    wins++;
+                    if (pnl > biggestWin) biggestWin = pnl;
+                }
+            });
+            if (resolved >= 5) {
+                showStat('polyWinRateStat', 'polyWinRateValue', (wins / resolved * 100).toFixed(1) + '%');
+            }
+            if (biggestWin > 0) {
+                showStat('polyBiggestWinStat', 'polyBiggestWinValue', '+' + fmtCompactUSD(biggestWin));
+            }
+
+            var volume = 0;
+            var markets = {};
+            open.concat(closed).forEach(function (p) {
+                var cost = (typeof p.initialValue === 'number' && p.initialValue > 0)
+                    ? p.initialValue
+                    : (p.size || 0) * (p.avgPrice || 0);
+                volume += cost;
+                var key = p.conditionId || p.title;
+                if (key) markets[key] = true;
+            });
+            if (volume > 0) {
+                showStat('polyVolumeStat', 'polyVolumeValue', fmtCompactUSD(volume));
+            }
+            var marketCount = Object.keys(markets).length;
+            if (marketCount > 0) {
+                showStat('polyMarketsStat', 'polyMarketsValue', String(marketCount));
+            }
+        }
+
         function render(data) {
             // Lifetime P&L = unrealized on open + realized on closed
             var openPnl = 0;
@@ -195,6 +253,7 @@
                 closedPnl += (p.realizedPnl || 0);
             });
             updatePnl(openPnl + closedPnl);
+            renderStats(data);
             renderPositions(data.open || []);
         }
 
